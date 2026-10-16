@@ -40,7 +40,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Assemble public files\n        run: |\n          mkdir -p dist/src\n          cp index.html app.js styles.css favicon.svg dist/\n          cp src/core.js dist/src/\n      - uses: actions/configure-pages@v5
+      - name: Assemble public files
+        run: |
+          mkdir -p dist/src
+          cp index.html app.js styles.css favicon.svg dist/
+          cp src/core.js dist/src/
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
