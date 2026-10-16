@@ -157,48 +157,75 @@ function animateReorder(container,change){
  }
 }
 function bindSortable(container,kind){
- container.querySelectorAll('.drag-handle').forEach(handle=>{
-   const row=handle.closest('.admin-row');
-   handle.addEventListener('keydown',event=>{
-     if(event.key!=='ArrowUp'&&event.key!=='ArrowDown')return;
-     event.preventDefault();
-     const sibling=event.key==='ArrowUp'?row.previousElementSibling:row.nextElementSibling;
-     if(!sibling?.classList.contains('admin-row'))return;
-     animateReorder(container,()=>event.key==='ArrowUp'?container.insertBefore(row,sibling):container.insertBefore(sibling,row));
-     handle.focus({preventScroll:true});persistOrder(container,kind);
-   });
-   handle.addEventListener('pointerdown',event=>{
-     if(event.button!==0)return;
-     event.preventDefault();
-     handle.setPointerCapture(event.pointerId);
-     row.classList.add('is-dragging');
-     const startY=event.clientY;
-     let moved=false;
-     const move=e=>{
-       if(Math.abs(e.clientY-startY)>5)moved=true;
-       const other=document.elementFromPoint(e.clientX,e.clientY)?.closest('.admin-row');
-       if(!other||other===row||other.parentElement!==container)return;
-       const mid=other.getBoundingClientRect().top+other.getBoundingClientRect().height/2;
-       animateReorder(container,()=>container.insertBefore(row,e.clientY<mid?other:other.nextElementSibling));
-     };
-     const end=()=>{
-       handle.removeEventListener('pointermove',move);
-       handle.removeEventListener('pointerup',end);
-       handle.removeEventListener('pointercancel',cancel);
-       row.classList.remove('is-dragging');
-       if(moved)persistOrder(container,kind);
-     };
-     const cancel=()=>{end();render()};
-     handle.addEventListener('pointermove',move);
-     handle.addEventListener('pointerup',end,{once:true});
-     handle.addEventListener('pointercancel',cancel,{once:true});
-   });
- });
+ const rows=[...container.querySelectorAll('.admin-row')];
+ for(const row of rows){
+  row.tabIndex=0;
+  row.setAttribute('aria-label','Réorganiser '+(row.querySelector('strong')?.textContent||'cet élément')+' avec les flèches haut et bas');
+  row.addEventListener('keydown',event=>{
+   if(event.target!==row||!['ArrowUp','ArrowDown'].includes(event.key))return;
+   event.preventDefault();
+   const sibling=event.key==='ArrowUp'?row.previousElementSibling:row.nextElementSibling;
+   if(!sibling?.classList.contains('admin-row'))return;
+   animateReorder(container,()=>event.key==='ArrowUp'?container.insertBefore(row,sibling):container.insertBefore(sibling,row));
+   row.focus({preventScroll:true});
+   persistOrder(container,kind);
+  });
+  row.addEventListener('pointerdown',event=>{
+   if(event.button!==0||event.target.closest('button,a,input,textarea,select,[contenteditable]'))return;
+   const startX=event.clientX,startY=event.clientY;
+   let active=false,finished=false,placeholder=null,ghost=null,offsetY=0,offsetX=0;
+   const originalNext=row.nextElementSibling;
+   const originalParent=row.parentElement;
+   const onMove=e=>{
+    if(!active&&Math.hypot(e.clientX-startX,e.clientY-startY)<6)return;
+    if(!active){
+     active=true;
+     const rect=row.getBoundingClientRect();
+     offsetY=startY-rect.top;offsetX=startX-rect.left;
+     placeholder=document.createElement('div');
+     placeholder.className='admin-drop-placeholder';
+     placeholder.style.height=rect.height+'px';
+     row.after(placeholder);
+     ghost=row.cloneNode(true);
+     ghost.classList.add('admin-drag-ghost');
+     ghost.removeAttribute('data-row-id');
+     Object.assign(ghost.style,{position:'fixed',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',margin:'0',zIndex:'9999',pointerEvents:'none'});
+     document.body.append(ghost);
+     row.classList.add('admin-drag-source');
+     container.classList.add('is-sorting');
+    }
+    e.preventDefault();
+    ghost.style.transform='translate3d('+(e.clientX-startX)+'px,'+(e.clientY-startY)+'px,0)';
+    const others=[...container.querySelectorAll('.admin-row:not(.admin-drag-source)')];
+    let before=null;
+    for(const other of others){const rect=other.getBoundingClientRect();if(e.clientY<rect.top+rect.height/2){before=other;break}}
+    if(before!==placeholder.nextElementSibling)animateReorder(container,()=>container.insertBefore(placeholder,before));
+    const margin=75,scrollSpeed=13;
+    const bounds=container.getBoundingClientRect();
+    if(e.clientY<Math.max(bounds.top,margin))window.scrollBy(0,-scrollSpeed);
+    else if(e.clientY>Math.min(bounds.bottom,innerHeight-margin))window.scrollBy(0,scrollSpeed);
+   };
+   const cleanup=()=>{window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);window.removeEventListener('pointercancel',onCancel);row.classList.remove('admin-drag-source');container.classList.remove('is-sorting');ghost?.remove()};
+   const onUp=()=>{
+    if(finished)return;finished=true;
+    if(active){placeholder.replaceWith(row);cleanup();persistOrder(container,kind)}
+    else cleanup();
+   };
+   const onCancel=()=>{
+    if(finished)return;finished=true;
+    if(active){if(originalNext?.parentElement===originalParent)originalParent.insertBefore(row,originalNext);else originalParent.append(row);placeholder?.remove()}
+    cleanup();
+   };
+   window.addEventListener('pointermove',onMove,{passive:false});
+   window.addEventListener('pointerup',onUp,{once:true});
+   window.addEventListener('pointercancel',onCancel,{once:true});
+  });
+ }
 }
 function render(){
 for(const kind of Object.keys(configs)){const list=state[kind],published=visibleItems(list);const grid=$(kind==='projects'?'project-grid':'workshop-grid');grid.innerHTML=published.length?published.map(p=>'<article><div class="image"><img loading="lazy" src="'+escapeHtml(p.image||photo)+'" alt="'+escapeHtml(p.title)+'"></div><h3>'+escapeHtml(p.title)+'</h3><p>'+escapeHtml(kind==='projects'?(p.category||'Projet')+' · '+(p.year||''):(p.audience||'')+' · '+(p.format||''))+'</p><div class="item-description">'+escapeHtml(p.description||'')+'</div></article>').join(''):'<p>Aucun contenu publié pour le moment.</p>';
 const stats=$(kind+'-stats');const counts=contentStats(list);stats.innerHTML=[['Total',counts.total],['Publiés',counts.published],['Brouillons',counts.drafts]].map(([label,n])=>'<div class="stat"><b>'+n+'</b><span>'+label+'</span></div>').join('');
-const container=$(kind+'-list');container.classList.add('admin-sortable');container.dataset.kind=kind;container.innerHTML=list.length?list.map(p=>'<div class="admin-row" data-row-id="'+escapeHtml(p.id)+'"><button type="button" class="drag-handle" aria-label="Déplacer '+escapeHtml(p.title)+' (flèches haut et bas)" title="Glisser pour réorganiser · ↑ ↓ au clavier"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="5" r="1"/><circle cx="16" cy="5" r="1"/><circle cx="8" cy="12" r="1"/><circle cx="16" cy="12" r="1"/><circle cx="8" cy="19" r="1"/><circle cx="16" cy="19" r="1"/></svg></button><img class="admin-row-image" src="'+escapeHtml(p.image||photo)+'" alt="" loading="lazy"><div class="admin-row-content"><strong>'+escapeHtml(p.title)+'</strong><small>'+escapeHtml(p.description||'Aucune description')+'</small><div class="admin-row-meta">'+(kind==='projects'?'<span>'+escapeHtml(p.category||'Projet')+'</span><span>'+escapeHtml(p.year||'Année non renseignée')+'</span>':'<span>'+escapeHtml(p.audience||'Tous publics')+'</span><span>'+escapeHtml(p.format||'Atelier')+'</span>')+(formatAdminDate(p)?'<span title="Dernière modification">Mis à jour '+escapeHtml(formatAdminDate(p))+'</span>':'')+'</div></div><div class="admin-actions"><button type="button" data-toggle="'+kind+':'+escapeHtml(p.id)+'" aria-label="'+(p.published?'Dépublier':'Publier')+'" title="'+(p.published?'Publié — masquer':'Brouillon — publier')+'">'+(p.published?visibilityIcon:hiddenIcon)+'</button><button type="button" data-edit="'+kind+':'+escapeHtml(p.id)+'" aria-label="Modifier" title="Modifier">'+pencilIcon+'</button><button data-delete="'+kind+':'+escapeHtml(p.id)+'" aria-label="Supprimer">'+trashIcon+'</button></div></div>').join(''):'<p class="empty-admin">Aucun élément pour le moment. Créez votre première fiche.</p>';
+const container=$(kind+'-list');container.classList.add('admin-sortable');container.dataset.kind=kind;container.innerHTML=list.length?list.map(p=>'<div class="admin-row" data-row-id="'+escapeHtml(p.id)+'"><img class="admin-row-image" src="'+escapeHtml(p.image||photo)+'" alt="" loading="lazy"><div class="admin-row-content"><strong>'+escapeHtml(p.title)+'</strong><small>'+escapeHtml(p.description||'Aucune description')+'</small><div class="admin-row-meta">'+(kind==='projects'?'<span>'+escapeHtml(p.category||'Projet')+'</span><span>'+escapeHtml(p.year||'Année non renseignée')+'</span>':'<span>'+escapeHtml(p.audience||'Tous publics')+'</span><span>'+escapeHtml(p.format||'Atelier')+'</span>')+(formatAdminDate(p)?'<span title="Dernière modification">'+escapeHtml(formatAdminDate(p))+'</span>':'')+'</div></div><div class="admin-actions"><button type="button" data-toggle="'+kind+':'+escapeHtml(p.id)+'" aria-label="'+(p.published?'Dépublier':'Publier')+'" title="'+(p.published?'Publié — masquer':'Brouillon — publier')+'">'+(p.published?visibilityIcon:hiddenIcon)+'</button><button type="button" data-edit="'+kind+':'+escapeHtml(p.id)+'" aria-label="Modifier" title="Modifier">'+pencilIcon+'</button><button data-delete="'+kind+':'+escapeHtml(p.id)+'" aria-label="Supprimer">'+trashIcon+'</button></div></div>').join(''):'<p class="empty-admin">Aucun élément pour le moment. Créez votre première fiche.</p>';
 bindSortable(container,kind);
 }
 document.querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>{const [kind,id]=el.dataset.edit.split(':');editor(kind,id)});
