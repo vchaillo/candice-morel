@@ -148,7 +148,7 @@ async function persistOrder(container,kind){
  catch(error){state[kind]=previous;render();message('Impossible de modifier l’ordre : '+error.message)}
 }
 function animateReorder(container,change){
- const rows=[...container.querySelectorAll('.admin-row')];
+ const rows=[...container.querySelectorAll('.admin-row:not(.admin-drag-ghost)')];
  const before=new Map(rows.map(row=>[row,row.getBoundingClientRect().top]));
  change();
  for(const row of rows){
@@ -196,7 +196,7 @@ function bindSortable(container,kind){
     }
     e.preventDefault();
     ghost.style.transform='translate3d('+(e.clientX-startX)+'px,'+(e.clientY-startY)+'px,0)';
-    const others=[...container.querySelectorAll('.admin-row:not(.admin-drag-source)')];
+    const others=[...container.querySelectorAll('.admin-row:not(.admin-drag-source):not(.admin-drag-ghost)')];
     let before=null;
     for(const other of others){const rect=other.getBoundingClientRect();if(e.clientY<rect.top+rect.height/2){before=other;break}}
     if(before!==placeholder.nextElementSibling)animateReorder(container,()=>container.insertBefore(placeholder,before));
