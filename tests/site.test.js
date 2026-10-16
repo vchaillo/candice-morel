@@ -69,7 +69,8 @@ test("placeholder credits and emoji-like arrows are removed", () => {
 test("mobile loader has a bounded fallback and home scroll restoration", () => {
   assert.match(html, /history\.scrollRestoration="manual"/);
   assert.match(html, /"app-loading"\);var loader/);
-  assert.match(script, /if\(studio\|\|book\|\|!location.hash/);
+  assert.match(script, /if\(studio\)window\.scrollTo\(0,0\)/);
+  assert.match(script, /else if\(!book&&\(!location.hash\|\|location.hash==='#home'\)\)window\.scrollTo\(0,0\)/);
 });
 
 test("Studio uses SVG controls instead of platform-dependent glyphs", () => {
