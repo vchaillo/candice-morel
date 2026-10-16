@@ -1,7 +1,7 @@
 import { CONTENT_CONFIG, escapeHtml, isAuthorizedAdmin, visibleItems, contentStats, initialsFromName, hasUnsavedChanges, normalizeEditableText, validateContent, getImageCrop, moveImageCrop, isImageSizeAllowed, isCompressedImageAllowed } from "./src/core.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, collection, doc, query, where, onSnapshot, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, collection, doc, query, where, onSnapshot, setDoc, deleteDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const app=initializeApp({apiKey:"AIzaSyAacPZBD_EhHfbPjhaU9vIRJVFzv7ZSu7U",authDomain:"candice-morel.firebaseapp.com",projectId:"candice-morel",storageBucket:"candice-morel.firebasestorage.app",messagingSenderId:"755634623005",appId:"1:755634623005:web:e516ad21721b16569fecf4"});
 const auth=getAuth(app),db=getFirestore(app);
@@ -108,7 +108,7 @@ $('book-page').querySelector('.book-close').addEventListener('click',()=>{
 });
 
 
-function startSubscriptions(){state.unsubs.forEach(f=>f());state.unsubs=[];for(const kind of Object.keys(configs)){const ref=collection(db,kind);const q=state.user?ref:query(ref,where("published","==",true));state.unsubs.push(onSnapshot(q,snapshot=>{state[kind]=snapshot.docs.map(d=>({id:d.id,...d.data()}));render()},e=>{console.error(e);message("Erreur de chargement Firestore : "+e.message)}))}}
+function startSubscriptions(){state.unsubs.forEach(f=>f());state.unsubs=[];for(const kind of Object.keys(configs)){const ref=collection(db,kind);const q=state.user?ref:query(ref,where("published","==",true));state.unsubs.push(onSnapshot(q,snapshot=>{state[kind]=snapshot.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number.isFinite(a.sortOrder)?a.sortOrder:Number.MAX_SAFE_INTEGER)-(Number.isFinite(b.sortOrder)?b.sortOrder:Number.MAX_SAFE_INTEGER));render()},e=>{console.error(e);message("Erreur de chargement Firestore : "+e.message)}))}}
 async function signIn(fn){$('login-error').textContent='';try{const result=await fn();if(!isAuthorizedAdmin(result.user,admins)){await signOut(auth);throw new Error("Ce compte n'est pas autorisé à accéder au Studio.")}}catch(e){$('login-error').textContent=e.code==='auth/unauthorized-domain'?"Ajoutez vchaillo.github.io aux domaines autorisés dans Firebase.":e.message||"Connexion impossible."}}
 $('login-form').onsubmit=e=>{e.preventDefault();signIn(()=>signInWithEmailAndPassword(auth,$('login-email').value,$('login-password').value))};
 $('google-login').onclick=()=>signIn(()=>signInWithPopup(auth,new GoogleAuthProvider()));
@@ -123,10 +123,71 @@ $('year').textContent=new Date().getFullYear();
 $('contact-form').onsubmit=e=>{e.preventDefault();const d=new FormData(e.target);location.href='mailto:candicemorelpro@gmail.com?subject='+encodeURIComponent('Contact professionnel — '+d.get('name'))+'&body='+encodeURIComponent('De : '+d.get('name')+' ('+d.get('email')+')\n\n'+d.get('message'))};
 const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}}),{threshold:.05});document.querySelectorAll('.section').forEach(el=>{el.classList.add('reveal');observer.observe(el)});
 const visibilityIcon="<svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>";const hiddenIcon="<svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m3 3 18 18M10.6 6.1c.5-.1.9-.1 1.4-.1 6.4 0 10 6 10 6a17 17 0 0 1-3.1 3.6M6.2 6.9C3.5 8.8 2 12 2 12s3.6 6 10 6c1.3 0 2.5-.3 3.6-.7\"/><path d=\"M10 10a3 3 0 0 0 4 4\"/></svg>";const pencilIcon="<svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m4 20 4.3-1 11-11a2.2 2.2 0 0 0-3.1-3.1l-11 11L4 20Z\"/><path d=\"m14.5 6.5 3 3\"/></svg>";
-const trashIcon='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg>';function render(){
+const trashIcon='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg>';// Pointer + keyboard sorting, persisted atomically in Firestore.
+async function persistOrder(container,kind){
+ const ids=[...container.querySelectorAll('[data-row-id]')].map(el=>el.dataset.rowId);
+ const before=state[kind].map(el=>el.id);
+ if(ids.every((id,i)=>id===before[i]))return;
+ const previous=[...state[kind]];
+ state[kind]=ids.map(id=>previous.find(el=>el.id===id));
+ const batch=writeBatch(db);
+ ids.forEach((id,i)=>batch.update(doc(db,kind,id),{sortOrder:i}));
+ try{await batch.commit();message('Nouvel ordre enregistré.')}
+ catch(error){state[kind]=previous;render();message('Impossible de modifier l’ordre : '+error.message)}
+}
+function animateReorder(container,change){
+ const rows=[...container.querySelectorAll('.admin-row')];
+ const before=new Map(rows.map(row=>[row,row.getBoundingClientRect().top]));
+ change();
+ for(const row of rows){
+   const delta=before.get(row)-row.getBoundingClientRect().top;
+   if(Math.abs(delta)>1){row.animate([{transform:'translateY('+delta+'px)'},{transform:'translateY(0)'}],{duration:230,easing:'cubic-bezier(.2,.8,.2,1)'})}
+ }
+}
+function bindSortable(container,kind){
+ container.querySelectorAll('.drag-handle').forEach(handle=>{
+   const row=handle.closest('.admin-row');
+   handle.addEventListener('keydown',event=>{
+     if(event.key!=='ArrowUp'&&event.key!=='ArrowDown')return;
+     event.preventDefault();
+     const sibling=event.key==='ArrowUp'?row.previousElementSibling:row.nextElementSibling;
+     if(!sibling?.classList.contains('admin-row'))return;
+     animateReorder(container,()=>event.key==='ArrowUp'?container.insertBefore(row,sibling):container.insertBefore(sibling,row));
+     handle.focus({preventScroll:true});persistOrder(container,kind);
+   });
+   handle.addEventListener('pointerdown',event=>{
+     if(event.button!==0)return;
+     event.preventDefault();
+     handle.setPointerCapture(event.pointerId);
+     row.classList.add('is-dragging');
+     const startY=event.clientY;
+     let moved=false;
+     const move=e=>{
+       if(Math.abs(e.clientY-startY)>5)moved=true;
+       const other=document.elementFromPoint(e.clientX,e.clientY)?.closest('.admin-row');
+       if(!other||other===row||other.parentElement!==container)return;
+       const mid=other.getBoundingClientRect().top+other.getBoundingClientRect().height/2;
+       animateReorder(container,()=>container.insertBefore(row,e.clientY<mid?other:other.nextElementSibling));
+     };
+     const end=()=>{
+       handle.removeEventListener('pointermove',move);
+       handle.removeEventListener('pointerup',end);
+       handle.removeEventListener('pointercancel',cancel);
+       row.classList.remove('is-dragging');
+       if(moved)persistOrder(container,kind);
+     };
+     const cancel=()=>{end();render()};
+     handle.addEventListener('pointermove',move);
+     handle.addEventListener('pointerup',end,{once:true});
+     handle.addEventListener('pointercancel',cancel,{once:true});
+   });
+ });
+}
+function render(){
 for(const kind of Object.keys(configs)){const list=state[kind],published=visibleItems(list);const grid=$(kind==='projects'?'project-grid':'workshop-grid');grid.innerHTML=published.length?published.map(p=>'<article><div class="image"><img loading="lazy" src="'+escapeHtml(p.image||photo)+'" alt="'+escapeHtml(p.title)+'"></div><h3>'+escapeHtml(p.title)+'</h3><p>'+escapeHtml(kind==='projects'?(p.category||'Projet')+' · '+(p.year||''):(p.audience||'')+' · '+(p.format||''))+'</p><div class="item-description">'+escapeHtml(p.description||'')+'</div></article>').join(''):'<p>Aucun contenu publié pour le moment.</p>';
 const stats=$(kind+'-stats');const counts=contentStats(list);stats.innerHTML=[['Total',counts.total],['Publiés',counts.published],['Brouillons',counts.drafts]].map(([label,n])=>'<div class="stat"><b>'+n+'</b><span>'+label+'</span></div>').join('');
-const container=$(kind+'-list');container.innerHTML=list.length?list.map(p=>'<div class="admin-row"><div><strong>'+escapeHtml(p.title)+'</strong><small>'+escapeHtml(p.description||'Aucune description')+'</small></div><div class="admin-actions"><button type="button" data-toggle="'+kind+':'+escapeHtml(p.id)+'" aria-label="'+(p.published?'Dépublier':'Publier')+'" title="'+(p.published?'Publié — masquer':'Brouillon — publier')+'">'+(p.published?visibilityIcon:hiddenIcon)+'</button><button type="button" data-edit="'+kind+':'+escapeHtml(p.id)+'" aria-label="Modifier" title="Modifier">'+pencilIcon+'</button><button data-delete="'+kind+':'+escapeHtml(p.id)+'" aria-label="Supprimer">'+trashIcon+'</button></div></div>').join(''):'<p class="empty-admin">Aucun élément pour le moment. Créez votre première fiche.</p>';
+const container=$(kind+'-list');container.classList.add('admin-sortable');container.dataset.kind=kind;container.innerHTML=list.length?list.map(p=>'<div class="admin-row" data-row-id="'+escapeHtml(p.id)+'"><button type="button" class="drag-handle" aria-label="Déplacer '+escapeHtml(p.title)+' (flèches haut et bas)" title="Glisser pour réorganiser · ↑ ↓ au clavier"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="5" r="1"/><circle cx="16" cy="5" r="1"/><circle cx="8" cy="12" r="1"/><circle cx="16" cy="12" r="1"/><circle cx="8" cy="19" r="1"/><circle cx="16" cy="19" r="1"/></svg></button><img class="admin-row-image" src="'+escapeHtml(p.image||photo)+'" alt="" loading="lazy"><div class="admin-row-content"><strong>'+escapeHtml(p.title)+'</strong><small>'+escapeHtml(p.description||'Aucune description')+'</small><div class="admin-row-meta">'+(kind==='projects'?'<span>'+escapeHtml(p.category||'Projet')+'</span><span>'+escapeHtml(p.year||'Année non renseignée')+'</span>':'<span>'+escapeHtml(p.audience||'Tous publics')+'</span><span>'+escapeHtml(p.format||'Atelier')+'</span>')+(p.date?'<span>'+escapeHtml(p.date)+'</span>':'')+'</div></div><div class="admin-actions"><button type="button" data-toggle="'+kind+':'+escapeHtml(p.id)+'" aria-label="'+(p.published?'Dépublier':'Publier')+'" title="'+(p.published?'Publié — masquer':'Brouillon — publier')+'">'+(p.published?visibilityIcon:hiddenIcon)+'</button><button type="button" data-edit="'+kind+':'+escapeHtml(p.id)+'" aria-label="Modifier" title="Modifier">'+pencilIcon+'</button><button data-delete="'+kind+':'+escapeHtml(p.id)+'" aria-label="Supprimer">'+trashIcon+'</button></div></div>').join(''):'<p class="empty-admin">Aucun élément pour le moment. Créez votre première fiche.</p>';
+bindSortable(container,kind);
 }
 document.querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>{const [kind,id]=el.dataset.edit.split(':');editor(kind,id)});
 document.querySelectorAll('[data-delete]').forEach(el=>el.onclick=()=>{const [kind,id]=el.dataset.delete.split(':');confirmDialog('Supprimer cet élément ?','Cette action est définitive.',async()=>{await deleteDoc(doc(db,kind,id))})});
@@ -154,6 +215,6 @@ canvas.onpointerdown=e=>{if(!img)return;drag={x:e.clientX,y:e.clientY,ox:offsetX
 canvas.onpointermove=e=>{if(!drag||!img)return;const rect=canvas.getBoundingClientRect(),zoom=Number($('crop-zoom').value)/100,base=Math.max(canvas.width/img.width,canvas.height/img.height)*zoom,w=img.width*base,h=img.height*base,dx=(e.clientX-drag.x)*canvas.width/rect.width,dy=(e.clientY-drag.y)*canvas.height/rect.height;offsetX=moveImageCrop(drag.ox,dx,w,canvas.width);offsetY=moveImageCrop(drag.oy,dy,h,canvas.height);drawCrop()};
 canvas.onpointerup=()=>{if(drag){drag=null;updateCrop()}};canvas.onpointercancel=()=>{drag=null};
 function updateCrop(){if(!img)return;let quality=.8;do{imageData=canvas.toDataURL('image/jpeg',quality);quality-=.1}while(imageData.length>500000&&quality>.25);if(imageData.length>500000){message('Image trop volumineuse après compression.');imageData=null;return}imageRemoved=false;};
-form.onsubmit=async e=>{e.preventDefault();if(!state.user)return;const d=new FormData(form);const data={title:String(d.get('title')).trim(),description:String(d.get('description')),published:d.has('published'),image:imageRemoved?'':(imageData||item.image||''),updatedAt:Date.now()};for(const [name] of cfg.fields)data[name]=String(d.get(name)||'');const validation=validateContent(kind,data);if(!validation.valid){message(validation.errors.join(' '));return}saving=true;const submit=form.querySelector('[type=submit]');submit.disabled=true;submit.textContent='Enregistrement…';try{await setDoc(doc(db,kind,id||crypto.randomUUID()),{...data,updatedAt:serverTimestamp()},{merge:true});dismiss();message('Modifications enregistrées sur Firebase.')}catch(err){saving=false;submit.disabled=false;submit.textContent='Enregistrer';message('Erreur Firestore : '+err.message)}};
+form.onsubmit=async e=>{e.preventDefault();if(!state.user)return;const d=new FormData(form);const data={title:String(d.get('title')).trim(),description:String(d.get('description')),published:d.has('published'),image:imageRemoved?'':(imageData||item.image||''),sortOrder:Number.isFinite(item.sortOrder)?item.sortOrder:state[kind].length,updatedAt:Date.now()};for(const [name] of cfg.fields)data[name]=String(d.get(name)||'');const validation=validateContent(kind,data);if(!validation.valid){message(validation.errors.join(' '));return}saving=true;const submit=form.querySelector('[type=submit]');submit.disabled=true;submit.textContent='Enregistrement…';try{await setDoc(doc(db,kind,id||crypto.randomUUID()),{...data,updatedAt:serverTimestamp()},{merge:true});dismiss();message('Modifications enregistrées sur Firebase.')}catch(err){saving=false;submit.disabled=false;submit.textContent='Enregistrer';message('Erreur Firestore : '+err.message)}};
 }
 subscribeIntros();render();updateEditableIntros();showRoute();
