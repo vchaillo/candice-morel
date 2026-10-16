@@ -220,3 +220,11 @@ test("editor has one panel-edge scrollbar and a sticky footer", () => {
  assert.match(css, /\.custom-modal #content-editor\.compact-editor\{min-height:0!important;max-height:100%;overflow-y:auto!important/);
  assert.match(css, /\.custom-modal #content-editor\.compact-editor \.form-actions\{position:sticky!important/);
 });
+
+test("contact send uses editorial underline and sliding right arrow", () => {
+ assert.match(html, /<path d="M4 12h16m-7-7 7 7-7 7"\/>/);
+ assert.match(css, /\.contact-footer \.contact-form \.contact-send::before\{display:none!important\}/);
+ assert.match(css, /\.contact-footer \.contact-form \.contact-send::after\{content:"";position:absolute/);
+ assert.match(css, /transform:scaleX\(0\)/);
+ assert.match(css, /transform:translateX\(7px\)/);
+});
