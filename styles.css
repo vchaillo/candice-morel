@@ -375,3 +375,13 @@ body.studio-modal-active{overflow:hidden!important}
 .custom-modal #content-editor.compact-editor .form-actions{position:sticky!important;bottom:0;flex-shrink:0;margin-top:auto!important}
 .custom-modal .dialog-shell:has(.compact-editor)>.modal-close{position:absolute;z-index:10;right:12px;top:10px}
 @media(max-width:740px){.custom-modal:has(.compact-editor){padding:10px!important}.custom-modal .dialog-shell:has(.compact-editor){max-height:calc(100dvh - 20px)!important}.custom-modal #content-editor.compact-editor{padding:45px 18px 0!important}}
+
+
+/* Contact action — option 01: understated editorial underline and traveling arrow. */
+.contact-footer .contact-form .contact-send{background:#f3f0eb!important;color:#151515!important;border:1px solid #f3f0eb!important;isolation:isolate;position:relative;overflow:hidden;transition:box-shadow .25s ease!important}
+.contact-footer .contact-form .contact-send::before{display:none!important}
+.contact-footer .contact-form .contact-send::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:#9f8270;transform:scaleX(0);transform-origin:left center;transition:transform .4s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.contact-footer .contact-form .contact-send:hover::after,.contact-footer .contact-form .contact-send:focus-visible::after{transform:scaleX(1)}
+.contact-footer .contact-form .contact-send svg{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.contact-footer .contact-form .contact-send:hover svg,.contact-footer .contact-form .contact-send:focus-visible svg{transform:translateX(7px)}
+@media(prefers-reduced-motion:reduce){.contact-footer .contact-form .contact-send::after,.contact-footer .contact-form .contact-send svg{transition:none}}
