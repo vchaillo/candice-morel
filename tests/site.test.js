@@ -170,3 +170,11 @@ test("Studio navigation avoids native anchor scroll and supports transition", ()
  assert.match(script, /history\.pushState\(null,'',destination\)/);
  assert.match(script, /document\.startViewTransition/);
 });
+
+test("contact footer fills desktop viewport and enlarges the signature", () => {
+ assert.match(css, /\.contact-footer\{min-height:100svh;min-height:100dvh/);
+ assert.match(css, /\.contact-footer-grid\{width:100%;max-width:1600px;flex:1/);
+ assert.match(css, /\.contact-footer-brand\{grid-area:brand;align-self:center/);
+ assert.match(css, /\.contact-footer \.footer-home-link>strong\{font-size:clamp\(82px,9vw,170px\)!important/);
+ assert.match(css, /\.contact-footer-brand \.footer-home-link>strong\{font-size:clamp\(64px,14vw,108px\)!important/);
+});
