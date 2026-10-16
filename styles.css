@@ -61,3 +61,36 @@ html{scroll-padding-top:0!important}body{overflow-x:hidden}#site>.section{scroll
 .profile-password-note{font-size:12px;color:#777}
 @media(max-width:740px){.editorial-footer .footer-links{align-items:flex-start}.admin-account-actions{margin-top:15px}#toast-stack{right:16px;bottom:16px}}
 .header-monogram{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px}.header-monogram img{display:block;width:39px;height:39px}.site-inline-edit{cursor:text!important;outline:none!important;box-shadow:none!important;border:0!important}.site-inline-edit:focus{outline:none!important;box-shadow:none!important;border:0!important}.site-inline-edit::selection{background:#b8b3aa;color:#111}
+
+
+/* Book — dedicated editorial gallery */
+.header-monogram{background:none!important;box-shadow:none!important;border:0!important}
+.header-monogram .header-cm{display:block;background:transparent;color:inherit}
+.footer-links .studio-footer-link{display:inline-flex;align-items:center;gap:9px}
+.footer-links .studio-footer-link .link-lock{flex:none}
+.link-arrow{display:inline-block;vertical-align:middle;flex:none}
+.contact-form .btn .link-arrow{margin-left:8px}
+.book-page{min-height:100vh;background:#f3f1ed;color:#191919;padding:clamp(105px,12vw,175px) clamp(24px,6vw,110px) 90px}
+.book-top{max-width:1300px;margin:0 auto 44px}
+.book-top h1{font:400 clamp(76px,12vw,180px)/.95 'Playfair Display',serif;letter-spacing:-.06em;margin:22px 0 24px}
+.book-top h1 em{font-weight:400}
+.book-top .prose{max-width:560px}
+.book-toolbar{display:flex;justify-content:space-between;gap:15px;margin-top:65px;padding-top:18px;border-top:1px solid #b9b5ae;font-size:10px;letter-spacing:.17em}
+.book-grid{max-width:1300px;margin:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+.book-tile{position:relative;display:block;cursor:zoom-in;overflow:hidden;border:0;background:#d7d4ce;padding:0;aspect-ratio:4/5;text-align:left}
+.book-tile:nth-child(5n + 2){aspect-ratio:4/6}
+.book-tile:nth-child(5n + 4){aspect-ratio:5/4}
+.book-tile img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(85%);transition:transform .5s ease,filter .4s ease}
+.book-tile:hover img,.book-tile:focus-visible img{transform:scale(1.035);filter:grayscale(0)}
+.book-tile span{position:absolute;left:18px;bottom:17px;color:#fff;font-size:10px;font-weight:600;letter-spacing:.17em;text-shadow:0 1px 9px #000b}
+.book-disclaimer{max-width:1300px;margin:30px auto 0;font-size:11px;color:#777}
+.book-lightbox{position:fixed;inset:0;z-index:11000;background:rgba(13,13,13,.97);display:flex;align-items:center;justify-content:center;padding:75px 75px 60px}
+.book-lightbox.hidden{display:none!important}
+.book-lightbox img{display:block;max-width:100%;max-height:100%;object-fit:contain}
+.book-lightbox button{position:absolute;cursor:pointer;background:none;border:0;color:#fff;font-size:34px;padding:14px}
+.book-lightbox-close{right:22px;top:12px}
+.book-lightbox-prev{left:15px;top:50%;transform:translateY(-50%)}
+.book-lightbox-next{right:15px;top:50%;transform:translateY(-50%)}
+.book-lightbox-count{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#ccc;letter-spacing:.18em;font-size:11px}
+@media(max-width:850px){.book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.book-toolbar{margin-top:35px}}
+@media(max-width:520px){.book-page{padding:110px 18px 55px}.book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.book-tile span{font-size:8px;left:9px;bottom:10px}.book-toolbar span:last-child{display:none}.book-lightbox{padding:65px 45px}.book-lightbox button{font-size:25px}.book-lightbox-prev{left:0}.book-lightbox-next{right:0}}
