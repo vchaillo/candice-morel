@@ -65,3 +65,24 @@ test("placeholder credits and emoji-like arrows are removed", () => {
   assert.match(html, /class="link-lock"/);
   assert.match(html, /class="header-cm"/);
 });
+
+test("mobile loader has a bounded fallback and home scroll restoration", () => {
+  assert.match(html, /history\.scrollRestoration="manual"/);
+  assert.match(html, /"app-loading"\);var loader/);
+  assert.match(script, /if\(studio\|\|book\|\|!location.hash/);
+});
+
+test("Studio uses SVG controls instead of platform-dependent glyphs", () => {
+  assert.doesNotMatch(html, /✉|♙|Mon profil ↗|Déconnexion ↗|>Afficher<|>Masquer</);
+  assert.match(html, /class="eye-visible"/);
+  assert.match(html, /class="eye-hidden"/);
+  assert.match(script, /const visibilityIcon=/);
+  assert.match(script, /const pencilIcon=/);
+  assert.match(script, /data-toggle=/);
+  assert.match(script, /\.onclick=\(\)=>\{const \[kind,id\]=el\.dataset\.toggle/);
+});
+
+test("Book header and mobile navigation have dedicated contrast rules", () => {
+  assert.match(css, /body:has\(#book-page:not\(\.hidden\)\) > header/);
+  assert.match(css, /header nav\{display:flex;justify-content:center;align-items:center;flex-wrap:wrap/);
+});
