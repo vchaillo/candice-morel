@@ -138,11 +138,35 @@ test("Book copy is editable and closing always returns to home", () => {
 });
 
 test("editor has single live crop canvas and explicit photo actions", () => {
-  assert.match(script, /id="photo-recrop"/);
+  assert.doesNotMatch(script, /id="photo-recrop"/);
   assert.match(script, /id="photo-remove"/);
   assert.match(script, /id="crop-canvas"/);
   assert.doesNotMatch(script, /id="image-preview"/);
   assert.match(script, /imageRemoved\?'':/);
   assert.match(script, /name="published"/);
   assert.match(css, /\.custom-modal:has\(\.compact-editor\)\{display:block;overflow-y:auto/);
+});
+
+test("Studio keeps save and cancel visible and prevents double scrolling", () => {
+ assert.match(css, /body\.studio-modal-active\{overflow:hidden!important\}/);
+ assert.match(css, /\.custom-modal #content-editor\.compact-editor \.form-actions\{position:sticky;bottom:0/);
+ assert.match(script, /document\.body\.classList\.add\('studio-modal-active'\)/);
+ assert.match(script, /document\.body\.classList\.remove\('studio-modal-active'\)/);
+});
+
+test("Admin rows expose compact metadata and sortable controls", () => {
+ assert.match(script, /class="drag-handle"/);
+ assert.match(script, /class="admin-row-image"/);
+ assert.match(script, /class="admin-row-meta"/);
+ assert.match(script, /formatAdminDate\(p\)/);
+ assert.match(script, /function bindSortable\(container,kind\)/);
+ assert.match(script, /function animateReorder\(container,change\)/);
+ assert.match(script, /writeBatch\(db\)/);
+ assert.match(script, /sortOrder:i/);
+ assert.match(script, /event\.key!=='ArrowUp'&&event\.key!=='ArrowDown'/);
+});
+
+test("Studio navigation avoids native anchor scroll and supports transition", () => {
+ assert.match(script, /history\.pushState\(null,'',destination\)/);
+ assert.match(script, /document\.startViewTransition/);
 });
