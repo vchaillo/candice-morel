@@ -23,15 +23,17 @@ workshops:[
 ]};
 async function importInitialData(){
 if(!state.user||!admins.has(state.user.uid)){message("Connectez-vous avec un compte administrateur autorisé.");return}
-const button=$('import-data');button.disabled=true;button.textContent='Importation…';
+const button=$('import-data');button.disabled=true;button.textContent='Importation…';message('Connexion à Firestore et vérification des documents…');
 let imported=0,skipped=0;const failures=[];
 try{
 for(const kind of Object.keys(initialData)){
+message('Vérification de la collection '+kind+'…');
 let existing;
 try{existing=await getDocs(collection(db,kind))}
 catch(e){failures.push(kind+": lecture refusée ("+(e.code||e.message)+")");continue}
 const ids=new Set(existing.docs.map(d=>d.id));
 for(const item of initialData[kind]){
+message('Importation : '+kind+' / '+item.title+'…');
 if(ids.has(item.id)){skipped++;continue}
 const {id,...data}=item;
 try{await setDoc(doc(db,kind,id),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});imported++}
@@ -43,7 +45,7 @@ message(imported+" importé(s), "+skipped+" déjà présent(s)."+details);
 }catch(e){message("Erreur d’importation : "+(e.code||e.message))}
 finally{button.disabled=false;button.textContent='Importer les contenus initiaux'}
 }
-$('import-data').onclick=importInitialData;
+document.addEventListener('click',event=>{const button=event.target.closest('#import-data');if(button){event.preventDefault();importInitialData()}});
 function message(text){$('studio-message').textContent=text}
 function showRoute(){const studio=['#studio','#admin'].includes(location.hash),logged=!!state.user;$('site').classList.toggle('hidden',studio);$('studio-login').classList.toggle('hidden',!studio||logged);$('admin').classList.toggle('hidden',!studio||!logged);document.querySelector('header').classList.toggle('header-studio',studio);if(studio)window.scrollTo({top:0,behavior:'instant'});else if(location.hash&&$(location.hash.slice(1)))requestAnimationFrame(()=>$(location.hash.slice(1)).scrollIntoView({block:'start',behavior:'smooth'}))}
 function startSubscriptions(){state.unsubs.forEach(f=>f());state.unsubs=[];for(const kind of Object.keys(configs)){const ref=collection(db,kind);const q=state.user?ref:query(ref,where("published","==",true));state.unsubs.push(onSnapshot(q,snapshot=>{state[kind]=snapshot.docs.map(d=>({id:d.id,...d.data()}));render()},e=>{console.error(e);message("Erreur de chargement Firestore : "+e.message)}))}}
@@ -52,7 +54,7 @@ $('login-form').onsubmit=e=>{e.preventDefault();signIn(()=>signInWithEmailAndPas
 $('google-login').onclick=()=>signIn(()=>signInWithPopup(auth,new GoogleAuthProvider()));
 $('toggle-password').onclick=()=>{const field=$('login-password');field.type=field.type==='password'?'text':'password';$('toggle-password').textContent=field.type==='password'?'Afficher':'Masquer'};
 $('logout').onclick=()=>signOut(auth);
-onAuthStateChanged(auth,async user=>{if(user&&!admins.has(user.uid)){await signOut(auth);return}state.user=user;message('');startSubscriptions();showRoute()});
+onAuthStateChanged(auth,async user=>{try{if(user&&!admins.has(user.uid)){await signOut(auth);return}state.user=user;message('');startSubscriptions();showRoute()}finally{document.documentElement.classList.remove('app-loading');const loader=$('app-loader');if(loader){loader.classList.add('done');setTimeout(()=>loader.remove(),450)}}},error=>{console.error('Firebase Auth initialization:',error);document.documentElement.classList.remove('app-loading');$('app-loader')?.remove();$('login-error').textContent='Impossible d’initialiser Firebase. Réessayez.'});
 window.addEventListener('hashchange',showRoute);
 document.querySelectorAll('nav a[href^="#"]').forEach(a=>a.addEventListener('click',()=>{if(location.hash===a.getAttribute('href'))showRoute()}));
 $('year').textContent=new Date().getFullYear();
