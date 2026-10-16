@@ -331,3 +331,6 @@ body.studio-modal-active{overflow:hidden!important}
  .admin-sortable .admin-actions button{width:29px!important;height:29px!important;padding:5px!important}
 }
 @media(prefers-reduced-motion:reduce){.admin-sortable .admin-drop-placeholder,.admin-drag-ghost{animation:none}}
+
+/* Touch sorting must own the gesture rather than letting the page pan. */
+.admin-sortable .admin-row{touch-action:none}
