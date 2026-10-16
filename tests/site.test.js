@@ -189,3 +189,16 @@ test("full-card drag offers a floating preview, a dashed target and persistence"
  assert.match(css, /border:2px dashed #777/);
  assert.doesNotMatch(script, /Mis à jour '\+escapeHtml/);
 });
+
+test("tablet footer stacks contact first and uses animated Send action", () => {
+ assert.match(css, /@media\(min-width:741px\) and \(max-width:1100px\)/);
+ assert.match(css, /\.contact-footer-form\{order:0;width:100%;align-self:stretch\}/);
+ assert.match(css, /\.contact-footer-brand\{order:1;width:100%/);
+ assert.doesNotMatch(html, /04 —/);
+ assert.equal((html.match(/class="contact-required"/g)||[]).length,3);
+ assert.match(html, /class="btn contact-send"/);
+ assert.match(html, /ENVOYER/);
+ assert.match(css, /\.contact-send::before\{content:"";position:absolute/);
+ assert.match(css, /transform:scaleX\(0\)/);
+ assert.match(css, /transform:scaleX\(1\)/);
+});
