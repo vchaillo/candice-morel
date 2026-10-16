@@ -22,18 +22,25 @@ workshops:[
 {id:"business",title:"Ateliers en entreprise",audience:"Entreprises",format:"Intervention",description:"Improvisation, coopération et prise de parole. Missions et références à documenter.",published:true,image:""}
 ]};
 async function importInitialData(){
-if(!state.user||!admins.has(state.user.uid))return;
-const button=$('import-data');button.disabled=true;button.textContent='Vérification…';
+if(!state.user||!admins.has(state.user.uid)){message("Connectez-vous avec un compte administrateur autorisé.");return}
+const button=$('import-data');button.disabled=true;button.textContent='Importation…';
+let imported=0,skipped=0;const failures=[];
 try{
-const batch=writeBatch(db);let count=0;
 for(const kind of Object.keys(initialData)){
-const existing=await getDocs(collection(db,kind));
+let existing;
+try{existing=await getDocs(collection(db,kind))}
+catch(e){failures.push(kind+": lecture refusée ("+(e.code||e.message)+")");continue}
 const ids=new Set(existing.docs.map(d=>d.id));
-for(const item of initialData[kind]){if(ids.has(item.id))continue;const {id,...data}=item;batch.set(doc(db,kind,id),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});count++}
+for(const item of initialData[kind]){
+if(ids.has(item.id)){skipped++;continue}
+const {id,...data}=item;
+try{await setDoc(doc(db,kind,id),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});imported++}
+catch(e){failures.push(kind+"/"+id+": "+(e.code||e.message))}
 }
-if(!count){message('Tous les éléments initiaux sont déjà présents dans Firebase.');return}
-await batch.commit();message(count+' éléments importés dans Firebase. Les contenus existants ont été conservés.');
-}catch(e){message('Import impossible : '+e.message)}
+}
+const details=failures.length?" Échecs : "+failures.join(" ; "):"";
+message(imported+" importé(s), "+skipped+" déjà présent(s)."+details);
+}catch(e){message("Erreur d’importation : "+(e.code||e.message))}
 finally{button.disabled=false;button.textContent='Importer les contenus initiaux'}
 }
 $('import-data').onclick=importInitialData;
@@ -62,7 +69,7 @@ document.querySelectorAll('[data-toggle]').forEach(el=>el.onchange=async()=>{con
 }
 $('add').onclick=()=>editor('projects');$('add-workshop').onclick=()=>editor('workshops');
 let modalClose=null;
-function modal(html){$('modal-root').innerHTML='<div class="modal custom-modal"><div class="dialog-shell">'+html+'</div></div>';const overlay=$('modal-root').firstElementChild;overlay.onclick=e=>{if(e.target===overlay)modalClose?.()};}
+function modal(html){$('modal-root').innerHTML='<div class="modal custom-modal"><div class="dialog-shell"><button type="button" class="modal-close" aria-label="Fermer">×</button>'+html+'</div></div>';$('modal-root').querySelector('.modal-close').onclick=()=>modalClose?.();const overlay=$('modal-root').firstElementChild;overlay.onclick=e=>{if(e.target===overlay)modalClose?.()};}
 function dismiss(){modalClose=null;$('modal-root').replaceChildren()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modalClose){e.preventDefault();modalClose()}});
 function confirmDialog(title,description,onConfirm,negative='Annuler',positive='Confirmer'){const old=modalClose;modal('<div class="confirm-icon">!</div><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(description)+'</p><div class="form-actions"><button type="button" class="btn alt" id="confirm-no">'+negative+'</button><button type="button" class="btn" id="confirm-yes">'+positive+'</button></div>');modalClose=()=>{dismiss();};$('confirm-no').onclick=()=>{dismiss()};$('confirm-yes').onclick=async()=>{try{await onConfirm();dismiss()}catch(e){$('confirm-yes').textContent='Erreur : '+e.message}};return old}
