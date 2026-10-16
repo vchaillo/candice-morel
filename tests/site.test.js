@@ -158,7 +158,7 @@ test("Admin rows expose compact metadata and sortable controls", () => {
  assert.doesNotMatch(script, /class="drag-handle"/);
  assert.match(script, /class="admin-row-image"/);
  assert.match(script, /class="admin-row-meta"/);
- assert.match(script, /formatAdminDate\(p\)/);
+ assert.doesNotMatch(script, /formatAdminDate\(p\)/);
  assert.match(script, /function bindSortable\(container,kind\)/);
  assert.match(script, /function animateReorder\(container,change\)/);
  assert.match(script, /writeBatch\(db\)/);
@@ -241,4 +241,17 @@ test("Studio list thumbnails stay at the same 16:10 aspect ratio as published ca
  assert.match(css, /\.admin-sortable \.admin-row-image,\.admin-sortable \.admin-drag-ghost \.admin-row-image\{/);
  assert.match(css, /height:auto!important/);
  assert.match(css, /aspect-ratio:16\/10!important/);
+});
+
+test("Studio tiles have flush 16:10 thumbnails and no modification date", () => {
+ assert.doesNotMatch(script, /Dernière modification/);
+ assert.match(css, /grid-template-columns:160px minmax\(0,1fr\) auto!important;height:100px!important/);
+ assert.match(css, /width:160px!important;height:100px!important/);
+});
+test("profile shows actual account name in cinematic header", () => {
+ assert.match(script, /class="studio-profile"/);
+ assert.match(script, /<h2>'\+escapeHtml\(name\)\+'<\/h2>/);
+ assert.doesNotMatch(script, /<h2>Mon profil<\/h2>/);
+ assert.match(css, /\.studio-profile-header\{background:#151515/);
+ assert.match(css, /\.contact-footer \.contact-form \.contact-send::after\{background:#151515!important\}/);
 });
