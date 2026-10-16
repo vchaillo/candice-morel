@@ -51,7 +51,7 @@ test("Book has a dedicated route, gallery and accessible lightbox", () => {
   assert.match(html, /href="#book"/);
   assert.match(html, /id="book-page"/);
   assert.match(html, /id="book-lightbox"/);
-  assert.equal((html.match(/class="book-tile"/g) || []).length, 8);
+  assert.equal((html.match(/class="book-tile"/g) || []).length, 5);
   assert.match(script, /book=location.hash==='#book'/);
   assert.match(script, /event.key==='ArrowLeft'/);
   assert.match(script, /event.key==='Escape'/);
@@ -115,4 +115,9 @@ test("Book is a modal with a bare close icon and no section number", () => {
 test("mobile contact form precedes the name and social links", () => {
   assert.match(css, /\.contact-footer-form\{order:0;width:100%\}/);
   assert.match(css, /\.contact-footer-brand\{order:1;width:100%/);
+});
+
+test("Book references five local Candice photographs", () => {
+  assert.equal((html.match(/assets\\/book\\/candice-\\d\\d\\.webp/g) || []).length, 5);
+  assert.match(html, /05 PHOTOGRAPHIES/);
 });
