@@ -215,3 +215,30 @@ body.book-active>footer{visibility:visible!important}
 @media(prefers-reduced-motion:reduce){
   .book-page.book-open .book-monogram{transition:none;opacity:1}
 }
+
+
+/* Editor: only the full viewport modal scrolls; no inset form scrollbar. */
+.custom-modal:has(.compact-editor){display:block;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:0;scrollbar-gutter:stable}
+.custom-modal .dialog-shell:has(.compact-editor){max-height:none!important;overflow:visible!important;min-height:100dvh;margin:0 auto;box-sizing:border-box}
+.custom-modal form.compact-editor{max-height:none!important;overflow:visible!important;background:transparent!important;padding:0!important}
+.custom-modal .compact-editor .photo-controls{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.custom-modal .compact-editor .upload-label{display:inline-flex!important;align-items:center;justify-content:center;cursor:pointer;border:1px solid #1b1b1b;background:#1b1b1b;color:#fff;padding:12px 18px;margin:0!important;font-size:13px;font-weight:500;transition:background .15s}
+.custom-modal .compact-editor .upload-label:hover{background:#444}
+.custom-modal .compact-editor .upload-label:focus-within{outline:2px solid #666;outline-offset:3px}
+.custom-modal .compact-editor #image-file{position:absolute!important;width:1px!important;height:1px!important;opacity:0;overflow:hidden;clip-path:inset(50%)}
+.custom-modal .compact-editor .photo-action{border:1px solid #aaa;background:transparent;color:#222;padding:12px 15px;font:inherit;font-size:13px;cursor:pointer}
+.custom-modal .compact-editor .photo-action:hover{border-color:#222}
+.custom-modal .compact-editor .photo-remove{color:#a13c32;border-color:#d8b4b0}
+.custom-modal .compact-editor .photo-action.hidden{display:none!important}
+.custom-modal .compact-editor #image-crop{margin:0}
+.custom-modal .compact-editor #crop-canvas{display:block;width:100%;height:auto;max-width:100%;touch-action:none}
+.custom-modal .compact-editor .editor-published{cursor:pointer}
+.custom-modal .compact-editor .editor-published input[type=checkbox]{position:absolute;opacity:0;width:1px!important;height:1px!important}
+.custom-modal .compact-editor .publish-eye{width:35px;height:35px;display:grid;place-items:center;border:1px solid #d5d2ce;border-radius:50%;color:#222;flex-shrink:0}
+.custom-modal .compact-editor .publish-eye svg{width:20px;height:20px;grid-area:1/1;stroke-linecap:round;stroke-linejoin:round}
+.custom-modal .compact-editor .publish-eye .eye-visible{display:none}
+.custom-modal .compact-editor input:checked+.publish-eye .eye-visible{display:block}
+.custom-modal .compact-editor input:checked+.publish-eye .eye-hidden{display:none}
+.custom-modal .compact-editor input:focus-visible+.publish-eye{outline:2px solid #555;outline-offset:3px}
+.book-page [data-site-text].site-inline-edit{cursor:text}
+@media(max-width:740px){.custom-modal .dialog-shell:has(.compact-editor){padding:55px 20px 30px}.custom-modal .compact-editor .photo-controls{gap:8px}}
