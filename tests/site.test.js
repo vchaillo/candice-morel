@@ -46,3 +46,22 @@ test("deployment runtime does not rely on unused legacy auth module", () => {
   assert.doesNotMatch(html, /firebase-auth\.js/);
   assert.match(script, /from "\.\/src\/core\.js"/);
 });
+
+test("Book has a dedicated route, gallery and accessible lightbox", () => {
+  assert.match(html, /href="#book"/);
+  assert.match(html, /id="book-page"/);
+  assert.match(html, /id="book-lightbox"/);
+  assert.equal((html.match(/class="book-tile"/g) || []).length, 8);
+  assert.match(script, /book=location.hash==='#book'/);
+  assert.match(script, /event.key==='ArrowLeft'/);
+  assert.match(script, /event.key==='Escape'/);
+});
+
+test("placeholder credits and emoji-like arrows are removed", () => {
+  assert.doesNotMatch(html, /PORTRAIT ISSU DU PORTFOLIO DE CANDICE/);
+  assert.doesNotMatch(html, /Biographie adaptée de son portfolio professionnel/);
+  assert.doesNotMatch(html, /Le formulaire ouvre votre application de messagerie/);
+  assert.doesNotMatch(html, /STUDIO ↗|INSTAGRAM ↗|PRÉPARER LE MESSAGE ↗/);
+  assert.match(html, /class="link-lock"/);
+  assert.match(html, /class="header-cm"/);
+});
