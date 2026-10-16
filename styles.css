@@ -188,3 +188,30 @@ body.book-active>header nav{display:none!important}
   .contact-footer-brand .footer-home-link{margin-bottom:20px}
   .contact-footer-brand .footer-links{margin-top:15px;gap:22px}
 }
+
+
+/* Book transition polish: the underlying header stays untouched while the
+   overlay physically slides across it. Its own CM takes over at the end. */
+html{scrollbar-gutter:stable}
+body.book-active{overflow:visible!important}
+body.book-active>header{position:relative!important;z-index:auto!important;pointer-events:auto!important;background:initial!important;color:inherit!important}
+body.book-active>header nav{display:flex!important;visibility:visible!important;pointer-events:auto!important}
+body.book-active>header .header-monogram{z-index:auto!important}
+body.book-active>footer{visibility:visible!important}
+.book-page{z-index:9000!important}
+.book-monogram{position:absolute;top:25px;left:clamp(20px,5vw,75px);z-index:9003;color:#171717;display:block;opacity:0;pointer-events:none;transition:opacity .18s ease}
+.book-monogram .header-cm{display:block}
+.book-page.book-open .book-monogram{opacity:1;pointer-events:auto;transition:opacity .2s ease .8s}
+.book-close svg{transition:none!important}
+.book-close:hover svg{transform:none!important}
+.book-close:hover{transform:none!important}
+.book-page .book-scroll{scrollbar-width:none}
+.book-page .book-scroll::-webkit-scrollbar{display:none}
+@media(max-width:740px){
+  body.book-active>header{position:relative!important;padding:initial!important}
+  body.book-active>header nav{display:flex!important}
+  .book-monogram{top:17px;left:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .book-page.book-open .book-monogram{transition:none;opacity:1}
+}
