@@ -118,6 +118,6 @@ test("mobile contact form precedes the name and social links", () => {
 });
 
 test("Book references five local Candice photographs", () => {
-  assert.equal((html.match(/assets\\/book\\/candice-\\d\\d\\.webp/g) || []).length, 5);
+  assert.equal((html.match(/assets\/book\/candice-\d\d\.webp/g) || []).length, 5);
   assert.match(html, /05 PHOTOGRAPHIES/);
 });
