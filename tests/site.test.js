@@ -255,3 +255,11 @@ test("profile shows actual account name in cinematic header", () => {
  assert.match(css, /\.studio-profile-header\{background:#151515/);
  assert.match(css, /\.contact-footer \.contact-form \.contact-send::after\{background:#151515!important\}/);
 });
+
+test("mobile header keeps CM on the left and Studio actions remain inline", () => {
+ assert.match(css, /body>header \.header-monogram\{align-self:flex-start!important/);
+ assert.match(css, /\.admin-head \.admin-account-actions\{display:flex;flex-wrap:nowrap!important/);
+ assert.match(css, /\.admin-stats\{display:grid!important;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+ assert.match(css, /\.admin-sortable \.admin-actions\{grid-column:3!important;grid-row:1!important;display:flex!important;flex-direction:row!important/);
+ assert.doesNotMatch(html, /Gérez les projets et les ateliers\. Toutes les modifications sont synchronisées avec Firebase\./);
+});
