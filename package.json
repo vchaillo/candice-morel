@@ -1,0 +1,16 @@
+{
+  "name": "candice-morel-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "npm run test && npm run check:syntax",
+    "check:syntax": "node --check app.js && node --check src/core.js && node --check tests/core.test.js",
+    "format": "prettier --write index.html app.js src tests .github/workflows README.md",
+    "format:check": "prettier --check index.html app.js src tests .github/workflows README.md"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}
