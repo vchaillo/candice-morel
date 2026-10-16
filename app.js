@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDocs, query, where, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, query, where, onSnapshot, setDoc, deleteDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const app=initializeApp({apiKey:"AIzaSyAacPZBD_EhHfbPjhaU9vIRJVFzv7ZSu7U",authDomain:"candice-morel.firebaseapp.com",projectId:"candice-morel",storageBucket:"candice-morel.firebasestorage.app",messagingSenderId:"755634623005",appId:"1:755634623005:web:e516ad21721b16569fecf4"});
 const auth=getAuth(app),db=getFirestore(app);
@@ -10,6 +10,33 @@ const $=id=>document.getElementById(id);
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const photo='https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=900&q=80';
 const configs={projects:{label:"Projet",collection:"projects",fields:[["category","Catégorie",["Théâtre","Cinéma","Performance","Écriture","Autre"]],["year","Année",null]]},workshops:{label:"Atelier",collection:"workshops",fields:[["audience","Public",["Enfants","Adolescents","Adultes","Entreprises","Tous publics"]],["format","Format",["Cours collectif","Atelier","Stage","Intervention","Formation"]]]}};
+const initialData={
+projects:[
+{id:"gazes",title:"Gazes",category:"Théâtre",year:"2020",description:"One-woman-show écrit et interprété par Candice Morel, mis en scène par Alexiane Cazenave. Chapel Playhouse, Londres, du 31 janvier au 2 février 2020.",published:true,image:"https://static.wixstatic.com/media/04c902_79195f4bd77948b980cfbf86a401b670~mv2.png"},
+{id:"skewered",title:"Skewered",category:"Théâtre",year:"2018",description:"Double programme de The Paper Theatre, associant Low Level Panic de Clare McIntyre et Cold Loneliness de Candice Morel. The Lion and Unicorn Theatre, Londres, du 9 au 14 avril 2018.",published:true,image:""},
+{id:"next",title:"Projet à venir",category:"Cinéma",year:"2026",description:"Projet fictif de démonstration, non publié.",published:false,image:""}
+],
+workshops:[
+{id:"impro",title:"Cours d’improvisation",audience:"Adultes",format:"Cours collectif",description:"Exercices de jeu, écoute, spontanéité et expression. Informations pratiques à confirmer.",published:true,image:""},
+{id:"kids",title:"Théâtre pour enfants",audience:"Enfants",format:"Atelier",description:"Découverte du jeu théâtral, de l’imaginaire et de l’expression en groupe. Informations pratiques à confirmer.",published:true,image:""},
+{id:"business",title:"Ateliers en entreprise",audience:"Entreprises",format:"Intervention",description:"Improvisation, coopération et prise de parole. Missions et références à documenter.",published:true,image:""}
+]};
+async function importInitialData(){
+if(!state.user||!admins.has(state.user.uid))return;
+const button=$('import-data');button.disabled=true;button.textContent='Vérification…';
+try{
+const batch=writeBatch(db);let count=0;
+for(const kind of Object.keys(initialData)){
+const existing=await getDocs(collection(db,kind));
+const ids=new Set(existing.docs.map(d=>d.id));
+for(const item of initialData[kind]){if(ids.has(item.id))continue;const {id,...data}=item;batch.set(doc(db,kind,id),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});count++}
+}
+if(!count){message('Tous les éléments initiaux sont déjà présents dans Firebase.');return}
+await batch.commit();message(count+' éléments importés dans Firebase. Les contenus existants ont été conservés.');
+}catch(e){message('Import impossible : '+e.message)}
+finally{button.disabled=false;button.textContent='Importer les contenus initiaux'}
+}
+$('import-data').onclick=importInitialData;
 function message(text){$('studio-message').textContent=text}
 function showRoute(){const studio=['#studio','#admin'].includes(location.hash),logged=!!state.user;$('site').classList.toggle('hidden',studio);$('studio-login').classList.toggle('hidden',!studio||logged);$('admin').classList.toggle('hidden',!studio||!logged);document.querySelector('header').classList.toggle('header-studio',studio);if(studio)window.scrollTo({top:0,behavior:'instant'});else if(location.hash&&$(location.hash.slice(1)))requestAnimationFrame(()=>$(location.hash.slice(1)).scrollIntoView({block:'start',behavior:'smooth'}))}
 function startSubscriptions(){state.unsubs.forEach(f=>f());state.unsubs=[];for(const kind of Object.keys(configs)){const ref=collection(db,kind);const q=state.user?ref:query(ref,where("published","==",true));state.unsubs.push(onSnapshot(q,snapshot=>{state[kind]=snapshot.docs.map(d=>({id:d.id,...d.data()}));render()},e=>{console.error(e);message("Erreur de chargement Firestore : "+e.message)}))}}
@@ -43,15 +70,15 @@ function editor(kind,id){
 const cfg=configs[kind],current=state[kind].find(p=>p.id===id),item=current||{title:'',description:'',image:'',published:false,year:new Date().getFullYear().toString(),category:'Théâtre',audience:'Adultes',format:'Atelier'};
 const fields=cfg.fields.map(([name,label,options])=>'<label>'+label+(options?'<select name="'+name+'">'+options.map(opt=>'<option '+(item[name]===opt?'selected':'')+'>'+escapeHtml(opt)+'</option>').join('')+'</select>':'<input name="'+name+'" value="'+escapeHtml(item[name]||'')+'">')+'</label>').join('');
 modal('<form id="content-editor"><div class="eyebrow">STUDIO · '+escapeHtml(cfg.label)+'</div><h2>'+(id?'Modifier':'Créer')+' '+(kind==='projects'?'un projet':'un atelier')+'</h2><label>Titre<input name="title" required maxlength="100" value="'+escapeHtml(item.title)+'"></label>'+fields+'<label>Description<textarea name="description" rows="4">'+escapeHtml(item.description)+'</textarea></label><label>Image (URL ou import local)<input type="url" name="image" id="image-url" value="'+escapeHtml(item.image||'')+'"></label><label class="upload-label">Importer et recadrer une image<input type="file" id="image-file" accept="image/jpeg,image/png,image/webp"></label><div id="image-crop" class="hidden"><canvas id="crop-canvas" width="480" height="300"></canvas><label>Zoom<input id="crop-zoom" type="range" min="100" max="250" value="100"></label><label>Horizontal<input id="crop-x" type="range" min="0" max="100" value="50"></label><label>Vertical<input id="crop-y" type="range" min="0" max="100" value="50"></label><button type="button" class="btn alt" id="apply-crop">Appliquer le recadrage</button><p class="small-note">Image compressée dans Firestore (maximum 500 Ko). Solution temporaire sans Firebase Storage.</p></div><label class="publish-toggle"><input type="checkbox" name="published" '+(item.published?'checked':'')+'> Publié sur le site</label><div class="form-actions"><button type="button" class="btn alt" id="cancel-editor">Annuler</button><button type="submit" class="btn">Enregistrer</button></div></form>');
-const form=$('content-editor');let imageData=null;let initial=JSON.stringify(new FormData(form).entries().toArray?.()||[...new FormData(form)]);let saving=false;
+const form=$('content-editor');let imageData=null;let initial=JSON.stringify([...new FormData(form)]);let saving=false;
 const isDirty=()=>imageData!==null||JSON.stringify([...new FormData(form)])!==initial;
-modalClose=()=>{if(saving)return;if(isDirty())confirmDialog('Quitter sans enregistrer ?','Vous avez des modifications non enregistrées. Souhaitez-vous les abandonner ?',()=>dismiss(),'Continuer','Abandonner');else dismiss()};
+modalClose=()=>{if(saving)return;if(!isDirty()){dismiss();return}const originalMarkup=$('modal-root').innerHTML;const restore=()=>{$('modal-root').innerHTML=originalMarkup;modalClose=()=>{};editor(kind,id)};confirmDialog('Modifications non enregistrées','Voulez-vous abandonner vos modifications ?',()=>dismiss(),'Rester','Abandonner');$('confirm-no').onclick=restore;};
 $('cancel-editor').onclick=()=>modalClose();
 let img=null;
-$('image-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;if(file.size>15*1024*1024){alert('Image trop volumineuse (15 Mo max).');return}const url=URL.createObjectURL(file);img=new Image();img.onload=()=>{URL.revokeObjectURL(url);$('image-crop').classList.remove('hidden');drawCrop()};img.src=url};
+$('image-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;if(file.size>15*1024*1024){message('Image trop volumineuse (15 Mo max).');return}const url=URL.createObjectURL(file);img=new Image();img.onload=()=>{URL.revokeObjectURL(url);$('image-crop').classList.remove('hidden');drawCrop()};img.src=url};
 function drawCrop(){if(!img)return;const canvas=$('crop-canvas'),ctx=canvas.getContext('2d');const zoom=Number($('crop-zoom').value)/100,base=Math.max(canvas.width/img.width,canvas.height/img.height)*zoom,w=img.width*base,h=img.height*base,dx=(canvas.width-w)*Number($('crop-x').value)/100,dy=(canvas.height-h)*Number($('crop-y').value)/100;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,dx,dy,w,h)}
 ['crop-zoom','crop-x','crop-y'].forEach(id=>$(id).oninput=drawCrop);
 $('apply-crop').onclick=()=>{if(!img)return;const canvas=$('crop-canvas');let quality=.8;do{imageData=canvas.toDataURL('image/jpeg',quality);quality-=.1}while(imageData.length>500000&&quality>.25);if(imageData.length>500000){message('Image trop volumineuse après compression.');imageData=null;return}$('image-url').value='';$('image-crop').classList.add('hidden');$('image-file').value='';message('Image recadrée, prête à enregistrer.')};
-form.onsubmit=async e=>{e.preventDefault();if(!state.user)return;const d=new FormData(form);const data={title:String(d.get('title')).trim(),description:String(d.get('description')),published:d.has('published'),image:imageData||String(d.get('image')||'').trim(),updatedAt:Date.now()};for(const [name] of cfg.fields)data[name]=String(d.get(name)||'');if(!data.title)return;saving=true;const submit=form.querySelector('[type=submit]');submit.disabled=true;submit.textContent='Enregistrement…';try{await setDoc(doc(db,kind,id||crypto.randomUUID()),data);dismiss();message('Modifications enregistrées sur Firebase.')}catch(err){saving=false;submit.disabled=false;submit.textContent='Enregistrer';message('Erreur Firestore : '+err.message)}};
+form.onsubmit=async e=>{e.preventDefault();if(!state.user)return;const d=new FormData(form);const data={title:String(d.get('title')).trim(),description:String(d.get('description')),published:d.has('published'),image:imageData||String(d.get('image')||'').trim(),updatedAt:Date.now()};for(const [name] of cfg.fields)data[name]=String(d.get(name)||'');if(!data.title)return;saving=true;const submit=form.querySelector('[type=submit]');submit.disabled=true;submit.textContent='Enregistrement…';try{await setDoc(doc(db,kind,id||crypto.randomUUID()),{...data,updatedAt:serverTimestamp()},{merge:true});dismiss();message('Modifications enregistrées sur Firebase.')}catch(err){saving=false;submit.disabled=false;submit.textContent='Enregistrer';message('Erreur Firestore : '+err.message)}};
 }
 render();showRoute();
