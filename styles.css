@@ -496,3 +496,57 @@ body.studio-modal-active{overflow:hidden!important}
  .admin-sortable .admin-actions button{flex-basis:23px!important;width:23px!important;height:23px!important;padding:3px!important}
  .admin-sortable .admin-actions{gap:2px!important}
 }
+
+
+/* Compact single-row mobile navigation, with Contact represented by an envelope. */
+.nav-contact-icon{display:none}
+@media(max-width:740px){
+ body>header{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;padding:13px 12px!important;flex-wrap:nowrap!important}
+ body>header .header-monogram{flex:0 0 35px!important;align-self:center!important;width:35px!important;height:35px!important}
+ body>header .header-monogram svg{width:35px;height:35px}
+ body>header nav{flex:1 1 auto!important;min-width:0;width:auto!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important;gap:clamp(7px,2.1vw,15px)!important;padding:0!important;margin:0!important;font-size:clamp(8px,2.1vw,10px)!important;letter-spacing:.045em!important}
+ body>header nav a{white-space:nowrap!important;flex-shrink:0;padding:8px 0!important}
+ body>header nav .nav-contact-text{display:none}
+ body>header nav .nav-contact-icon{display:block;width:18px;height:18px}
+ body.book-active>header{display:flex!important;flex-direction:row!important;align-items:center!important}
+}
+@media(max-width:360px){body>header{padding:12px 8px!important;gap:4px!important}body>header nav{gap:6px!important;font-size:8px!important}}
+/* Account controls directly under the global header, right aligned. */
+@media(max-width:1100px){
+ .admin{padding-top:62px!important}
+ .admin-head .admin-account-actions{margin:0!important;align-self:flex-end!important}
+ .admin-head{gap:19px!important}
+}
+@media(max-width:740px){
+ .admin{padding-top:62px!important}
+ .admin-head .admin-account-actions{margin:0!important}
+ .admin-block{margin-top:35px!important}
+ /* Give cards a little more air without losing their edge-to-edge image. */
+ .admin-sortable .admin-row,.admin-sortable .admin-drag-ghost{height:90px!important;min-height:90px!important;max-height:90px!important;grid-template-columns:112px minmax(0,1fr) 94px!important;gap:10px!important}
+ .admin-sortable .admin-row-image,.admin-sortable .admin-drag-ghost .admin-row-image{width:112px!important;height:70px!important;align-self:center!important}
+ .admin-sortable .admin-row-content{padding:10px 0!important}
+ .admin-sortable .admin-actions{padding-right:8px!important}
+}
+@media(max-width:380px){
+ .admin-sortable .admin-row,.admin-sortable .admin-drag-ghost{height:84px!important;min-height:84px!important;max-height:84px!important;grid-template-columns:96px minmax(0,1fr) 84px!important;gap:6px!important}
+ .admin-sortable .admin-row-image,.admin-sortable .admin-drag-ghost .admin-row-image{width:96px!important;height:60px!important}
+}
+/* Shared Book-style circular close control. */
+.custom-modal .modal-close{width:46px!important;height:46px!important;display:grid!important;place-items:center!important;border:1px solid #222!important;border-radius:50%!important;background:transparent!important;color:#171717!important;transition:transform .35s,background .35s,color .35s!important;padding:0!important}
+.custom-modal .modal-close:hover{transform:rotate(90deg);background:#171717!important;color:#fff!important}
+.custom-modal .modal-close svg{width:24px;height:24px;display:block}
+.custom-modal .dialog-shell:has(.studio-profile)>.modal-close{color:#f5f3ef!important;border-color:#a6a09a!important}
+.custom-modal .dialog-shell:has(.studio-profile)>.modal-close:hover{background:#f5f3ef!important;color:#151515!important}
+/* Mobile editors and profile fill the viewport; confirmations remain compact and centered. */
+@media(max-width:740px){
+ .custom-modal:not(.is-confirmation){inset:0!important;display:flex!important;align-items:stretch!important;justify-content:stretch!important;padding:0!important;overflow:hidden!important}
+ .custom-modal:not(.is-confirmation) .dialog-shell{width:100%!important;max-width:none!important;height:100dvh!important;max-height:100dvh!important;min-height:100dvh!important;border-radius:0!important;margin:0!important;overflow-y:auto!important;overscroll-behavior:contain;box-sizing:border-box}
+ .custom-modal:not(.is-confirmation) .dialog-shell:has(.compact-editor){display:flex!important;flex-direction:column;overflow:hidden!important}
+ .custom-modal:not(.is-confirmation) #content-editor.compact-editor{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;padding:68px 20px 0!important}
+ .custom-modal:not(.is-confirmation) .dialog-shell:has(.studio-profile){padding:0!important;overflow-y:auto!important}
+ .custom-modal:not(.is-confirmation) .studio-profile{min-height:100%;background:#f5f3ef}
+ .custom-modal:not(.is-confirmation) .modal-close{position:fixed!important;top:15px!important;right:16px!important;z-index:20!important}
+ .custom-modal.is-confirmation{inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:20px!important;overflow:hidden!important}
+ .custom-modal.is-confirmation .dialog-shell{width:min(420px,100%)!important;min-height:0!important;max-height:calc(100dvh - 40px)!important;height:auto!important;overflow-y:auto!important;margin:0!important;padding:32px 24px!important}
+ .custom-modal.is-confirmation .modal-close{position:absolute!important;top:10px!important;right:10px!important;width:36px!important;height:36px!important}
+}
