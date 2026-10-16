@@ -155,7 +155,7 @@ test("Studio keeps save and cancel visible and prevents double scrolling", () =>
 });
 
 test("Admin rows expose compact metadata and sortable controls", () => {
- assert.match(script, /class="drag-handle"/);
+ assert.doesNotMatch(script, /class="drag-handle"/);
  assert.match(script, /class="admin-row-image"/);
  assert.match(script, /class="admin-row-meta"/);
  assert.match(script, /formatAdminDate\(p\)/);
@@ -163,7 +163,7 @@ test("Admin rows expose compact metadata and sortable controls", () => {
  assert.match(script, /function animateReorder\(container,change\)/);
  assert.match(script, /writeBatch\(db\)/);
  assert.match(script, /sortOrder:i/);
- assert.match(script, /event\.key!=='ArrowUp'&&event\.key!=='ArrowDown'/);
+ assert.match(script, /event\.key==='ArrowUp'/);
 });
 
 test("Studio navigation avoids native anchor scroll and supports transition", () => {
@@ -177,4 +177,15 @@ test("contact footer fills desktop viewport and enlarges the signature", () => {
  assert.match(css, /\.contact-footer-brand\{grid-area:brand;align-self:center/);
  assert.match(css, /\.contact-footer \.footer-home-link>strong\{font-size:clamp\(82px,9vw,170px\)!important/);
  assert.match(css, /\.contact-footer-brand \.footer-home-link>strong\{font-size:clamp\(64px,14vw,108px\)!important/);
+});
+
+test("full-card drag offers a floating preview, a dashed target and persistence", () => {
+ assert.match(script, /row\.addEventListener\('pointerdown'/);
+ assert.match(script, /ghost=row\.cloneNode\(true\)/);
+ assert.match(script, /admin-drop-placeholder/);
+ assert.match(script, /window\.addEventListener\('pointermove',onMove/);
+ assert.match(script, /persistOrder\(container,kind\)/);
+ assert.match(css, /\.admin-sortable \.admin-row-image\{width:112px!important;height:100%!important/);
+ assert.match(css, /border:2px dashed #777/);
+ assert.doesNotMatch(script, /Mis à jour '\+escapeHtml/);
 });
