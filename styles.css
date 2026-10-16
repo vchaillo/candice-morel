@@ -304,3 +304,30 @@ body.studio-modal-active{overflow:hidden!important}
  .contact-footer-brand .footer-home-link>strong{font-size:clamp(64px,14vw,108px)!important;line-height:.9;letter-spacing:-.06em}
  .contact-footer-brand .footer-home-link>.eyebrow{margin-bottom:18px}
 }
+
+
+/* Full-card sorting: edge-to-edge 8:5 crop, floating tile and dashed landing zone. */
+.admin-sortable .admin-row{grid-template-columns:112px minmax(0,1fr) auto!important;padding:0!important;min-height:92px;gap:16px;cursor:grab;touch-action:pan-y;user-select:none;overflow:visible}
+.admin-sortable .admin-row:active{cursor:grabbing}
+.admin-sortable .admin-row:focus-visible{outline:2px solid #222;outline-offset:3px}
+.admin-sortable .admin-row-image{width:112px!important;height:100%!important;min-height:92px;aspect-ratio:8/5;object-fit:cover;align-self:stretch;margin:0;border-radius:0;pointer-events:none}
+.admin-sortable .admin-row-content{padding:10px 0;pointer-events:none}
+.admin-sortable .admin-row-content *{pointer-events:none}
+.admin-sortable .admin-actions{padding:0 14px 0 0;align-self:center}
+.admin-sortable .admin-actions button{cursor:pointer}
+.admin-sortable .admin-row-meta span:last-child[title]{background:transparent}
+.admin-sortable .admin-row.is-dragging,.admin-sortable .admin-drag-source{opacity:.2;border-style:dashed}
+.admin-sortable .admin-drop-placeholder{box-sizing:border-box;border:2px dashed #777;background:repeating-linear-gradient(-45deg,#f3f1ed,#f3f1ed 7px,#faf9f7 7px,#faf9f7 14px);border-radius:2px;flex-shrink:0;animation:admin-drop-pulse .8s ease-in-out infinite alternate}
+.admin-drag-ghost{box-shadow:0 20px 45px #0003!important;border:1px solid #888!important;background:#fff!important;opacity:.97;transform-origin:center;cursor:grabbing!important;animation:admin-drag-lift .16s ease-out both}
+.admin-drag-ghost .admin-actions{visibility:hidden}
+.admin-sortable.is-sorting{cursor:grabbing}
+@keyframes admin-drop-pulse{to{border-color:#bbb;background-position:12px 0}}
+@keyframes admin-drag-lift{from{filter:brightness(.95)}to{filter:brightness(1)}}
+@media(max-width:740px){
+ .admin-sortable .admin-row{grid-template-columns:78px minmax(0,1fr) auto!important;gap:9px;min-height:86px}
+ .admin-sortable .admin-row-image{width:78px!important;min-height:86px}
+ .admin-sortable .admin-row-content{padding:8px 0}
+ .admin-sortable .admin-actions{grid-column:auto!important;margin:0!important;padding-right:6px;display:flex;flex-direction:column;gap:2px}
+ .admin-sortable .admin-actions button{width:29px!important;height:29px!important;padding:5px!important}
+}
+@media(prefers-reduced-motion:reduce){.admin-sortable .admin-drop-placeholder,.admin-drag-ghost{animation:none}}
