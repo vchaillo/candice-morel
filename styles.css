@@ -385,3 +385,31 @@ body.studio-modal-active{overflow:hidden!important}
 .contact-footer .contact-form .contact-send svg{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
 .contact-footer .contact-form .contact-send:hover svg,.contact-footer .contact-form .contact-send:focus-visible svg{transform:translateX(7px)}
 @media(prefers-reduced-motion:reduce){.contact-footer .contact-form .contact-send::after,.contact-footer .contact-form .contact-send svg{transition:none}}
+
+
+/* Studio reorder: the placeholder replaces the grabbed card in its original slot. */
+.admin-sortable .admin-drop-placeholder{
+ box-sizing:border-box;
+ border:1px dashed #bdb8b0;
+ background:repeating-linear-gradient(-45deg,#f7f6f3,#f7f6f3 10px,#f3f1ed 10px,#f3f1ed 20px);
+ border-radius:2px;
+ animation:none!important;
+ opacity:.82;
+ flex-shrink:0;
+}
+.admin-sortable .admin-drag-source{opacity:1}
+.admin-sortable .admin-drag-ghost{opacity:.96;box-shadow:0 12px 32px #0002!important}
+/* Fixed 16:10 thumbnails: image height follows its width, not the row height. */
+.admin-sortable .admin-row,.admin-sortable .admin-drag-ghost{align-items:center!important;overflow:hidden}
+.admin-sortable .admin-row-image,.admin-sortable .admin-drag-ghost .admin-row-image{
+ width:112px!important;
+ height:auto!important;
+ min-height:0!important;
+ aspect-ratio:16/10!important;
+ object-fit:cover!important;
+ align-self:center!important;
+ display:block;
+}
+@media(max-width:740px){
+ .admin-sortable .admin-row-image,.admin-sortable .admin-drag-ghost .admin-row-image{width:78px!important;height:auto!important;min-height:0!important}
+}
