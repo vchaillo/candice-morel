@@ -2,9 +2,16 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function isAdmin() {
-      return request.auth != null && request.auth.uid == "REPLACE_WITH_CANDICE_UID";
+      return request.auth != null && request.auth.uid in [
+        "9VuRSJuuEKc7fOQAjywrSIVB8Ql2",
+        "DcTMZFM3YhO5os0GSnVs1FIFW272"
+      ];
     }
     match /projects/{projectId} {
+      allow read: if isAdmin() || resource.data.published == true;
+      allow create, update, delete: if isAdmin();
+    }
+    match /workshops/{workshopId} {
       allow read: if isAdmin() || resource.data.published == true;
       allow create, update, delete: if isAdmin();
     }
