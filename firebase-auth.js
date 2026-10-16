@@ -1,33 +1,37 @@
-// Firebase Authentication: configure these public values after creating your Firebase web app.
-// The Firebase config is public; never put service-account keys or passwords here.
+// Public Firebase web configuration; never store passwords or service account keys here.
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  appId: ""
+  apiKey: "AIzaSyAacPZBD_EhHfbPjhaU9vIRJVFzv7ZSu7U",
+  authDomain: "candice-morel.firebaseapp.com",
+  projectId: "candice-morel",
+  storageBucket: "candice-morel.firebasestorage.app",
+  messagingSenderId: "755634623005",
+  appId: "1:755634623005:web:e516ad21721b16569fecf4"
 };
-// Copy the UID of Candice's Firebase Authentication account here.
-// Only this UID may access the Studio UI.
-const allowedAdminUid = "";
-if (firebaseConfig.apiKey && allowedAdminUid) {
-  const [{ initializeApp }, { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }] = await Promise.all([
-    import("https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js"),
-    import("https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js")
-  ]);
-  const auth = getAuth(initializeApp(firebaseConfig));
-  window.firebaseSignIn = async (email, password) => {
-    const credential = await signInWithEmailAndPassword(auth, email, password);
-    if (credential.user.uid !== allowedAdminUid) {
-      await signOut(auth);
-      throw new Error("Unauthorized user");
-    }
-  };
-  window.firebaseSignOut = () => signOut(auth);
-  onAuthStateChanged(auth, async user => {
-    if (user && user.uid !== allowedAdminUid) {
-      await signOut(auth);
-      return;
-    }
-    window.onFirebaseUser?.(user);
-  });
-}
+const ADMIN_UIDS = new Set(["9VuRSJuuEKc7fOQAjywrSIVB8Ql2", "DcTMZFM3YhO5os0GSnVs1FIFW272"]);
+const [{ initializeApp }, { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }] = await Promise.all([
+  import("https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js"),
+  import("https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js")
+]);
+const auth = getAuth(initializeApp(firebaseConfig));
+const assertAdmin = async user => {
+  if (!user || !ADMIN_UIDS.has(user.uid)) {
+    await signOut(auth);
+    throw new Error("unauthorized");
+  }
+};
+window.firebaseSignIn = async (email, password) => {
+  const { user } = await signInWithEmailAndPassword(auth, email, password);
+  await assertAdmin(user);
+};
+window.firebaseGoogleSignIn = async () => {
+  const { user } = await signInWithPopup(auth, new GoogleAuthProvider());
+  await assertAdmin(user);
+};
+window.firebaseSignOut = () => signOut(auth);
+onAuthStateChanged(auth, async user => {
+  if (user && !ADMIN_UIDS.has(user.uid)) {
+    await signOut(auth);
+    return;
+  }
+  window.onFirebaseUser?.(user);
+});
