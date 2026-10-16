@@ -27,7 +27,39 @@ document.addEventListener('click',event=>{const el=event.target.closest('[data-s
 document.addEventListener('keydown',event=>{const el=event.target.closest?.('[data-site-text]');if(el&&state.user&&!editingNode&&(event.key==='Enter'||event.key===' ')){event.preventDefault();beginTextEdit(el)}});
 const configs=CONTENT_CONFIG;
 function message(text){if(!text)return;const stack=$('toast-stack');if(!stack)return;const toast=document.createElement('div');toast.className='site-toast'+(/erreur|impossible|refus|échec/i.test(text)?' toast-error':'');const content=document.createElement('span');content.textContent=text;const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label','Fermer la notification');toast.append(content,close);stack.append(toast);const remove=()=>{if(!toast.isConnected)return;toast.classList.add('toast-out');setTimeout(()=>toast.remove(),230)};close.onclick=remove;setTimeout(remove,4600);while(stack.children.length>4)stack.firstElementChild.remove()}
-function showRoute(){const studio=['#studio','#admin'].includes(location.hash),logged=!!state.user;$('site').classList.toggle('hidden',studio);$('studio-login').classList.toggle('hidden',!studio||logged);$('admin').classList.toggle('hidden',!studio||!logged);document.querySelector('header').classList.toggle('header-studio',studio);if(studio)window.scrollTo({top:0,behavior:'instant'});else if(location.hash&&$(location.hash.slice(1)))requestAnimationFrame(()=>$(location.hash.slice(1)).scrollIntoView({block:'start',behavior:'smooth'}))}
+function showRoute(){const studio=['#studio','#admin'].includes(location.hash),book=location.hash==='#book',logged=!!state.user;$('site').classList.toggle('hidden',studio||book);$('book-page').classList.toggle('hidden',!book);$('studio-login').classList.toggle('hidden',!studio||logged);$('admin').classList.toggle('hidden',!studio||!logged);document.querySelector('header').classList.toggle('header-studio',studio);if(studio||book)window.scrollTo({top:0,behavior:'instant'});else if(location.hash&&$(location.hash.slice(1)))requestAnimationFrame(()=>$(location.hash.slice(1)).scrollIntoView({block:'start',behavior:'smooth'}))}
+
+// Book: keyboard-accessible image viewer with history-friendly hash routing.
+const bookImages=[...document.querySelectorAll('.book-tile img')];
+let bookIndex=0;
+const bookLightbox=$('book-lightbox');
+function openBookImage(index){
+  bookIndex=(index+bookImages.length)%bookImages.length;
+  const source=bookImages[bookIndex];
+  $('book-lightbox-image').src=source.currentSrc||source.src;
+  $('book-lightbox-image').alt=source.alt;
+  $('book-lightbox-count').textContent=String(bookIndex+1).padStart(2,'0')+' / '+String(bookImages.length).padStart(2,'0');
+  bookLightbox.classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  bookLightbox.querySelector('.book-lightbox-close').focus();
+}
+function closeBookImage(){
+  bookLightbox.classList.add('hidden');
+  document.body.style.overflow='';
+}
+document.querySelectorAll('.book-tile').forEach((tile,index)=>tile.addEventListener('click',()=>openBookImage(index)));
+bookLightbox.querySelector('.book-lightbox-close').onclick=closeBookImage;
+bookLightbox.querySelector('.book-lightbox-prev').onclick=()=>openBookImage(bookIndex-1);
+bookLightbox.querySelector('.book-lightbox-next').onclick=()=>openBookImage(bookIndex+1);
+bookLightbox.addEventListener('click',event=>{if(event.target===bookLightbox)closeBookImage()});
+document.addEventListener('keydown',event=>{
+  if(bookLightbox.classList.contains('hidden'))return;
+  if(event.key==='Escape'){event.preventDefault();closeBookImage()}
+  if(event.key==='ArrowLeft'){event.preventDefault();openBookImage(bookIndex-1)}
+  if(event.key==='ArrowRight'){event.preventDefault();openBookImage(bookIndex+1)}
+});
+window.addEventListener('hashchange',closeBookImage);
+
 function startSubscriptions(){state.unsubs.forEach(f=>f());state.unsubs=[];for(const kind of Object.keys(configs)){const ref=collection(db,kind);const q=state.user?ref:query(ref,where("published","==",true));state.unsubs.push(onSnapshot(q,snapshot=>{state[kind]=snapshot.docs.map(d=>({id:d.id,...d.data()}));render()},e=>{console.error(e);message("Erreur de chargement Firestore : "+e.message)}))}}
 async function signIn(fn){$('login-error').textContent='';try{const result=await fn();if(!isAuthorizedAdmin(result.user,admins)){await signOut(auth);throw new Error("Ce compte n'est pas autorisé à accéder au Studio.")}}catch(e){$('login-error').textContent=e.code==='auth/unauthorized-domain'?"Ajoutez vchaillo.github.io aux domaines autorisés dans Firebase.":e.message||"Connexion impossible."}}
 $('login-form').onsubmit=e=>{e.preventDefault();signIn(()=>signInWithEmailAndPassword(auth,$('login-email').value,$('login-password').value))};
