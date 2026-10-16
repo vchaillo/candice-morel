@@ -242,3 +242,43 @@ body.book-active>footer{visibility:visible!important}
 .custom-modal .compact-editor input:focus-visible+.publish-eye{outline:2px solid #555;outline-offset:3px}
 .book-page [data-site-text].site-inline-edit{cursor:text}
 @media(max-width:740px){.custom-modal .dialog-shell:has(.compact-editor){padding:55px 20px 30px}.custom-modal .compact-editor .photo-controls{gap:8px}}
+
+
+/* Studio editor — balanced layout with anchored action bar. */
+body.studio-modal-active{overflow:hidden!important}
+.custom-modal:has(.compact-editor){inset:0 8px 0 0;padding:0!important;scrollbar-width:thin;scrollbar-color:#b8b5af #efeeeb;background:#161616c9}
+.custom-modal .dialog-shell:has(.compact-editor){display:flex;flex-direction:column;min-height:100dvh!important;width:min(700px,100%)!important;margin:0 auto!important;padding:clamp(28px,4vw,48px) clamp(20px,4vw,46px) 0!important;box-shadow:0 0 45px #0002}
+.custom-modal #content-editor.compact-editor{flex:1;min-height:calc(100dvh - 65px);display:flex;flex-direction:column;gap:18px}
+.custom-modal #content-editor.compact-editor .form-actions{position:sticky;bottom:0;z-index:6;margin-top:auto!important;padding:16px 0 max(18px,env(safe-area-inset-bottom))!important;background:#fff;box-shadow:0 -9px 18px #fffef9;border-top:1px solid #e7e4df}
+.custom-modal #content-editor.compact-editor .form-actions .btn{min-width:116px}
+.custom-modal #content-editor.compact-editor .editor-media{margin:0!important}
+.admin-sortable{display:flex;flex-direction:column;gap:8px}
+.admin-sortable .admin-row{display:grid!important;grid-template-columns:30px 74px minmax(0,1fr) auto;align-items:center;gap:14px;margin:0!important;padding:12px 15px!important;border:1px solid #eae7e1;background:#fff;min-width:0;transition:box-shadow .18s,border-color .18s}
+.admin-sortable .admin-row.is-dragging{position:relative;z-index:2;box-shadow:0 12px 32px #0002;border-color:#9c9994;background:#faf9f7}
+.admin-sortable .drag-handle{border:0;background:transparent;color:#777;width:30px;height:42px;padding:6px;display:grid;place-items:center;cursor:grab;touch-action:none}
+.admin-sortable .drag-handle:active{cursor:grabbing}
+.admin-sortable .drag-handle:focus-visible{outline:2px solid #111;outline-offset:1px}
+.admin-sortable .drag-handle svg{pointer-events:none}
+.admin-sortable .admin-row-image{width:74px;height:64px;object-fit:cover;background:#eeece8;display:block}
+.admin-sortable .admin-row-content{min-width:0;overflow:hidden}
+.admin-sortable .admin-row-content strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.admin-sortable .admin-row-content small{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#666;font-size:12px;margin-top:3px}
+.admin-sortable .admin-row-meta{display:flex;align-items:center;flex-wrap:wrap;gap:5px 8px;margin-top:7px}
+.admin-sortable .admin-row-meta span{font-size:10px;letter-spacing:.02em;color:#6a6660;background:#f2f0ec;padding:4px 7px;white-space:nowrap}
+.admin-sortable .admin-actions{display:flex;flex-wrap:nowrap;gap:5px;justify-content:flex-end}
+.admin-sortable .admin-actions button{width:34px!important;height:34px!important;padding:7px!important}
+@media(max-width:740px){
+ .custom-modal:has(.compact-editor){inset:0 5px 0 0}
+ .custom-modal #content-editor.compact-editor .form-actions{justify-content:stretch}
+ .custom-modal #content-editor.compact-editor .form-actions .btn{flex:1;min-width:0}
+ .admin-sortable .admin-row{grid-template-columns:24px 56px minmax(0,1fr);gap:9px;padding:10px!important}
+ .admin-sortable .admin-row-image{width:56px;height:56px}
+ .admin-sortable .admin-actions{grid-column:2/-1;justify-content:flex-end;margin-top:-4px}
+ .admin-sortable .drag-handle{width:24px}
+}
+@media(prefers-reduced-motion:reduce){.admin-sortable .admin-row{transition:none}}
+@keyframes studio-appear{from{opacity:.35;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+::view-transition-new(root){animation:studio-appear .38s cubic-bezier(.2,.8,.2,1) both}
+::view-transition-old(root){animation:fade-out .2s ease both}
+@keyframes fade-out{to{opacity:0}}
+@media(prefers-reduced-motion:reduce){::view-transition-new(root),::view-transition-old(root){animation:none}}
