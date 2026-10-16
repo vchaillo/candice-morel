@@ -100,7 +100,7 @@ test("Book opens as an inert, closable overlay with its own scrolling area", () 
   assert.match(html, /class="book-close"/);
   assert.match(html, /class="book-scroll"/);
   assert.match(script, /classList\.toggle\('book-open',book\)/);
-  assert.match(script, /location\.hash=bookReturnHash/);
+  assert.match(script, /location\.hash='#home'/);
   assert.match(css, /\.book-page\.book-open/);
   assert.match(css, /\.book-scroll\{height:100%;overflow-y:auto/);
 });
@@ -110,7 +110,7 @@ test("Book is a modal with a bare close icon and no section number", () => {
   assert.doesNotMatch(html, /PORTFOLIO PHOTOGRAPHIQUE · 05/);
   assert.match(css, /\.book-page\{z-index:9000!important/);
   assert.match(css, /\.book-close\{border:0!important/);
-  assert.match(script, /event\.key==='Escape'\)\{event\.preventDefault\(\);location\.hash=bookReturnHash/);
+  assert.match(script, /event\.key==='Escape'\)\{event\.preventDefault\(\);location\.hash='#home'/);
 });
 
 test("mobile contact form precedes the name and social links", () => {
@@ -129,4 +129,20 @@ test("Book slide keeps original header and scrollbars stable", () => {
   assert.match(css, /body\.book-active\{overflow:visible!important\}/);
   assert.match(css, /body\.book-active>header\{position:absolute!important/);
   assert.match(css, /\.book-close:hover svg\{transform:none!important\}/);
+});
+
+test("Book copy is editable and closing always returns to home", () => {
+  for(const key of ['book-eyebrow','book-title','book-description'])assert.match(html,new RegExp('data-site-text="'+key+'"'));
+  assert.match(script, /location\.hash='#home'/);
+  assert.doesNotMatch(script, /location\.hash=bookReturnHash/);
+});
+
+test("editor has single live crop canvas and explicit photo actions", () => {
+  assert.match(script, /id="photo-recrop"/);
+  assert.match(script, /id="photo-remove"/);
+  assert.match(script, /id="crop-canvas"/);
+  assert.doesNotMatch(script, /id="image-preview"/);
+  assert.match(script, /imageRemoved\?'':/);
+  assert.match(script, /name="published"/);
+  assert.match(css, /\.custom-modal:has\(\.compact-editor\)\{display:block;overflow-y:auto/);
 });
