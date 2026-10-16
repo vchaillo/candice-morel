@@ -25,3 +25,31 @@ The homepage and Gazes artwork link to assets from Candice's existing Wix portfo
 ## Deployment
 
 Settings → Pages → Source: GitHub Actions. Push to `main` to deploy.
+
+
+## Développement et qualité
+
+Application statique en JavaScript natif : aucun serveur Node.js n'est nécessaire pour la servir.
+Node.js 22 est utilisé pour les outils de développement et les tests.
+
+```bash
+npm install
+npm run check
+npm run format
+npm run format:check
+```
+
+- `index.html` : structure et styles du site public et du Studio (CSS historique à extraire).
+- `app.js` : intégration navigateur, Firebase Authentication, Firestore et interactions (module historique en cours de découpage).
+- `src/core.js` : logique pure, validation des formulaires, droits d'affichage, recadrage et helpers réutilisables.
+- `tests/core.test.js` : tests unitaires avec `node:test`, sans connexion Firebase.
+- `firestore.rules` : règles d'accès à publier dans Firebase Console.
+- `.github/workflows/deploy.yml` : contrôle qualité obligatoire avant le déploiement GitHub Pages.
+
+**Important :** les tests automatisés actuels couvrent les fonctions pures. Ils ne remplacent pas des tests d'intégration Firebase, des tests navigateur ou un audit de sécurité. Avant la production VPS, ajouter ces vérifications, un verrouillage des dépendances, la séparation complète CSS/JS et des en-têtes HTTP de sécurité.
+
+## Préparation VPS (non déployée)
+
+Le futur workflow VPS devra construire ou assembler un répertoire public contenant `index.html`, `app.js`, `src/core.js`, `favicon.svg` et les autres assets réellement utilisés, puis transférer cet ensemble via SSH/rsync vers Nginx. Ne pas exposer les tests, fichiers de configuration et fichiers Git dans la racine web.
+
+Les paramètres Firebase utilisés par le client ne sont pas des secrets serveur. L'accès administrateur doit continuer d'être appliqué par les règles Firestore, indépendamment du contrôle d'interface. Prévoir la configuration du domaine VPS dans les domaines autorisés de Firebase Authentication.
