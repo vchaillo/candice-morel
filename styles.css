@@ -97,13 +97,13 @@ html{scroll-padding-top:0!important}body{overflow-x:hidden}#site>.section{scroll
 
 
 /* Header contrast for the dedicated light Book page */
-body:has(#book-page:not(.hidden)) > header{color:#191919;background:#f3f1ed;position:relative;z-index:20}
-body:has(#book-page:not(.hidden)) .book-page{padding-top:clamp(45px,7vw,90px)}
+body.book-active > header{color:#191919;background:transparent;position:fixed;z-index:102}
+body.book-active .book-page{padding-top:0}
 /* Mobile navigation: keep all five links tappable, without horizontal overflow */
 @media(max-width:740px){
   header nav{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px 15px;max-width:100%;padding:0 8px}
   header nav a{display:inline-block;white-space:nowrap;padding:5px 0;min-height:28px}
-  body:has(#book-page:not(.hidden)) > header{padding-bottom:18px}
+  body.book-active > header{padding-bottom:18px}
   .admin-head{display:flex;flex-direction:column;align-items:stretch}
   .admin-head .admin-account-actions{order:-1;display:flex;justify-content:flex-end;gap:8px;margin:0 0 26px;flex-wrap:wrap}
   .admin-account-actions .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:12px;padding:10px 12px}
