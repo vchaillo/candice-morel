@@ -194,7 +194,7 @@ body.book-active>header nav{display:none!important}
    overlay physically slides across it. Its own CM takes over at the end. */
 html{scrollbar-gutter:stable}
 body.book-active{overflow:visible!important}
-body.book-active>header{position:relative!important;z-index:auto!important;pointer-events:auto!important;background:initial!important;color:inherit!important}
+body.book-active>header{position:absolute!important;z-index:3!important;pointer-events:auto!important;background:transparent!important;color:#fff!important}
 body.book-active>header nav{display:flex!important;visibility:visible!important;pointer-events:auto!important}
 body.book-active>header .header-monogram{z-index:auto!important}
 body.book-active>footer{visibility:visible!important}
@@ -208,7 +208,7 @@ body.book-active>footer{visibility:visible!important}
 .book-page .book-scroll{scrollbar-width:none}
 .book-page .book-scroll::-webkit-scrollbar{display:none}
 @media(max-width:740px){
-  body.book-active>header{position:relative!important;padding:initial!important}
+  body.book-active>header{position:absolute!important;padding:16px 18px!important}
   body.book-active>header nav{display:flex!important}
   .book-monogram{top:17px;left:16px}
 }
