@@ -120,3 +120,47 @@ body:has(#book-page:not(.hidden)) .book-page{padding-top:clamp(45px,7vw,90px)}
 .admin-actions button svg{width:20px;height:20px;display:block;stroke:currentColor}
 .admin-actions button:hover{background:#f0eeea}
 .admin-actions button:focus-visible{outline:2px solid #191919;outline-offset:2px}
+
+
+/* Unified contact and footer */
+.contact-footer{display:block!important;padding:clamp(65px,8vw,120px) clamp(24px,7vw,110px) 22px;background:#151515;color:#f3f0eb;scroll-margin-top:0}
+.contact-footer-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(35px,7vw,130px);align-items:start;max-width:1500px;margin:0 auto 85px}
+.contact-footer-brand{display:flex;flex-direction:column;gap:40px;padding-top:35px}
+.contact-footer .footer-home-link{color:#f4f1ec}
+.contact-footer .footer-links{display:flex;align-items:flex-start;flex-direction:column;gap:18px}
+.contact-footer .footer-links a{color:#d5d2ce}
+.contact-footer .footer-bottom{max-width:1500px;margin:auto;border-top:1px solid #373737;padding-top:24px}
+.contact-footer-form h2{font:400 clamp(42px,5vw,76px)/1.05 'Playfair Display',serif;letter-spacing:-.04em;margin:20px 0}
+.contact-footer-form h2 em{font-weight:400}
+.contact-footer-form .prose{font-size:15px;line-height:1.7;color:#b9b7b3}
+.contact-footer-form .contact-form{max-width:none;margin-top:22px}
+.contact-footer-form .contact-form label{color:#c8c6c2}
+.contact-footer-form .contact-form input,.contact-footer-form .contact-form textarea{background:#242424;border-color:#4c4c4c;color:#fff}
+.contact-footer-form .contact-form .btn{background:#f3f0eb;color:#151515;border-color:#f3f0eb}
+/* Full-viewport editorial Book transition. Scroll remains inside the overlay. */
+.book-page{position:fixed!important;inset:0;z-index:100;display:block!important;min-height:0!important;width:100%;height:100dvh;padding:0!important;background:#f3f1ed;overflow:hidden;visibility:hidden;pointer-events:none;transform:translate3d(105%,0,0);transition:transform 1.05s cubic-bezier(.76,0,.16,1),visibility 0s linear 1.05s;will-change:transform;contain:layout paint}
+.book-page.book-open{visibility:visible;pointer-events:auto;transform:translate3d(0,0,0);transition:transform 1.05s cubic-bezier(.76,0,.16,1),visibility 0s}
+.book-scroll{height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:clamp(110px,12vw,170px) clamp(24px,6vw,110px) 75px}
+.book-close{position:fixed;top:25px;right:clamp(20px,5vw,75px);z-index:103;width:46px;height:46px;display:grid;place-items:center;border:1px solid #222;background:transparent;color:#171717;border-radius:50%;cursor:pointer;transition:transform .35s,background .35s,color .35s}
+.book-close:hover{transform:rotate(90deg);background:#171717;color:#fff}
+.book-active{overflow:hidden}
+body.book-active>header{position:fixed!important;z-index:102!important;top:0;left:0;width:100%;pointer-events:none;background:transparent!important;color:#171717!important}
+body.book-active>header .header-monogram{pointer-events:auto;position:relative;z-index:104}
+body.book-active>header nav{visibility:hidden;pointer-events:none}
+body.book-active>footer{visibility:hidden}
+.book-page .book-top{margin-top:0}
+@media(max-width:740px){
+  .contact-footer{padding:65px 24px 22px}
+  .contact-footer-grid{grid-template-columns:1fr;gap:60px;margin-bottom:70px}
+  .contact-footer-brand{padding-top:0;gap:25px}
+  .contact-footer-form h2{font-size:clamp(42px,11vw,65px)}
+  .book-scroll{padding:125px 18px 60px}
+  .book-close{top:17px;right:16px;width:42px;height:42px}
+  body.book-active>header{padding:16px 18px!important;text-align:left}
+  body.book-active>header .header-monogram{margin:0}
+  body.book-active>header nav{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .book-page,.book-page.book-open{transition:visibility 0s,transform .01s}
+  .book-close{transition:none}
+}
