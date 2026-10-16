@@ -164,3 +164,27 @@ body.book-active>footer{visibility:hidden}
   .book-page,.book-page.book-open{transition:visibility 0s,transform .01s}
   .book-close{transition:none}
 }
+
+
+/* Book is a true fullscreen modal: above every site layer except the CM mark. */
+.book-page{z-index:9000!important;inset:0!important;position:fixed!important;isolation:isolate}
+.book-page.book-open{transform:translate3d(0,0,0)}
+.book-close{border:0!important;border-radius:0!important;background:transparent!important;color:#171717!important;padding:0!important;width:48px;height:48px}
+.book-close svg{transition:transform .4s cubic-bezier(.2,.8,.2,1);width:27px;height:27px}
+.book-close:hover{transform:none!important}
+.book-close:hover svg{transform:rotate(90deg)}
+.book-close:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+body.book-active>header{z-index:9001!important;background:none!important}
+body.book-active>header .header-monogram{z-index:9002!important}
+body.book-active>header nav{display:none!important}
+.book-page .book-scroll{height:100dvh;overflow-y:auto;overflow-x:hidden}
+.contact-footer-grid{grid-template-areas:"brand form"}
+.contact-footer-brand{grid-area:brand}
+.contact-footer-form{grid-area:form}
+@media(max-width:740px){
+  .contact-footer-grid{display:flex;flex-direction:column;gap:70px;align-items:stretch}
+  .contact-footer-form{order:0;width:100%}
+  .contact-footer-brand{order:1;width:100%;padding-top:32px;border-top:1px solid #383838}
+  .contact-footer-brand .footer-home-link{margin-bottom:20px}
+  .contact-footer-brand .footer-links{margin-top:15px;gap:22px}
+}
