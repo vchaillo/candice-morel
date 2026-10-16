@@ -1,17 +1,39 @@
-name: Deploy GitHub Pages
+name: Test and deploy GitHub Pages
+
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
+  test:
+    name: Quality checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install development tools
+        run: npm install --no-package-lock --ignore-scripts
+      - name: Run unit tests and syntax checks
+        run: npm run check
+
   deploy:
+    name: Deploy static site
+    needs: test
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
