@@ -228,3 +228,17 @@ test("contact send uses editorial underline and sliding right arrow", () => {
  assert.match(css, /transform:scaleX\(0\)/);
  assert.match(css, /transform:translateX\(7px\)/);
 });
+
+test("drag placeholder replaces the row instead of pushing the list down", () => {
+ assert.match(script, /row\.replaceWith\(placeholder\)/);
+ assert.doesNotMatch(script, /row\.after\(placeholder\)/);
+ assert.match(script, /placeholder\.replaceWith\(row\)/);
+ assert.match(css, /\.admin-sortable \.admin-drop-placeholder\{/);
+ assert.match(css, /border:1px dashed #bdb8b0/);
+ assert.match(css, /animation:none!important/);
+});
+test("Studio list thumbnails stay at the same 16:10 aspect ratio as published cards", () => {
+ assert.match(css, /\.admin-sortable \.admin-row-image,\.admin-sortable \.admin-drag-ghost \.admin-row-image\{/);
+ assert.match(css, /height:auto!important/);
+ assert.match(css, /aspect-ratio:16\/10!important/);
+});
