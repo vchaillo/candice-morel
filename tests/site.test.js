@@ -202,3 +202,21 @@ test("tablet footer stacks contact first and uses animated Send action", () => {
  assert.match(css, /transform:scaleX\(0\)/);
  assert.match(css, /transform:scaleX\(1\)/);
 });
+
+test("portfolio images keep one 16:10 crop across cards, editor and admin", () => {
+ assert.match(css, /\.project-grid article \.image\{aspect-ratio:16\/10/);
+ assert.match(css, /\.project-grid article \.image img\{display:block;width:100%;height:100%!important/);
+ assert.match(css, /\.portrait-photo img\{aspect-ratio:16\/10!important/);
+ assert.match(css, /\.custom-modal \.compact-editor #crop-canvas\{aspect-ratio:16\/10/);
+ assert.match(css, /\.admin-sortable \.admin-row-image\{aspect-ratio:16\/10!important/);
+});
+test("drag preview inherits sortable styles and is excluded from targets", () => {
+ assert.match(script, /container\.append\(ghost\)/);
+ assert.match(script, /\.admin-row:not\(\.admin-drag-source\):not\(\.admin-drag-ghost\)/);
+ assert.match(css, /\.admin-sortable \.admin-drag-ghost\{display:grid!important/);
+});
+test("editor has one panel-edge scrollbar and a sticky footer", () => {
+ assert.match(css, /\.custom-modal:has\(\.compact-editor\)\{inset:0!important;display:flex!important/);
+ assert.match(css, /\.custom-modal #content-editor\.compact-editor\{min-height:0!important;max-height:100%;overflow-y:auto!important/);
+ assert.match(css, /\.custom-modal #content-editor\.compact-editor \.form-actions\{position:sticky!important/);
+});
