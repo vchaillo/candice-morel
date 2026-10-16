@@ -185,7 +185,7 @@ function bindSortable(container,kind){
      placeholder=document.createElement('div');
      placeholder.className='admin-drop-placeholder';
      placeholder.style.height=rect.height+'px';
-     row.after(placeholder);
+     row.replaceWith(placeholder);
      ghost=row.cloneNode(true);
      ghost.classList.add('admin-drag-ghost');
      ghost.removeAttribute('data-row-id');
