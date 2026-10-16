@@ -83,6 +83,23 @@ test("Studio uses SVG controls instead of platform-dependent glyphs", () => {
 });
 
 test("Book header and mobile navigation have dedicated contrast rules", () => {
-  assert.match(css, /body:has\(#book-page:not\(\.hidden\)\) > header/);
+  assert.match(css, /body\.book-active > header/);
   assert.match(css, /header nav\{display:flex;justify-content:center;align-items:center;flex-wrap:wrap/);
+});
+
+test("contact and footer share one section with preserved form anchor", () => {
+  assert.match(html, /<footer class="footer editorial-footer contact-footer" id="contact">/);
+  assert.equal((html.match(/id="contact-form"/g) || []).length, 1);
+  assert.equal((html.match(/id="contact"/g) || []).length, 1);
+  assert.match(html, /class="contact-footer-grid"/);
+});
+
+test("Book opens as an inert, closable overlay with its own scrolling area", () => {
+  assert.match(html, /id="book-page"[^>]*aria-hidden="true" inert/);
+  assert.match(html, /class="book-close"/);
+  assert.match(html, /class="book-scroll"/);
+  assert.match(script, /classList\.toggle\('book-open',book\)/);
+  assert.match(script, /location\.hash=bookReturnHash/);
+  assert.match(css, /\.book-page\.book-open/);
+  assert.match(css, /\.book-scroll\{height:100%;overflow-y:auto/);
 });
