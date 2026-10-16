@@ -354,3 +354,24 @@ body.studio-modal-active{overflow:hidden!important}
 .contact-footer .contact-form .contact-send svg{transition:transform .3s ease}
 .contact-footer .contact-form .contact-send:hover svg{transform:translate(3px,-3px)}
 @media(prefers-reduced-motion:reduce){.contact-footer .contact-form .contact-send::before,.contact-footer .contact-form .contact-send,.contact-footer .contact-form .contact-send svg{transition:none}}
+
+
+/* Shared portfolio media crop: 16:10 everywhere, including responsive cards and editor. */
+.project-grid article .image{aspect-ratio:16/10;width:100%;overflow:hidden}
+.project-grid article .image img{display:block;width:100%;height:100%!important;aspect-ratio:16/10;object-fit:cover}
+.portrait-photo img{aspect-ratio:16/10!important;height:auto!important}
+.custom-modal .compact-editor #crop-canvas{aspect-ratio:16/10;height:auto!important;object-fit:contain}
+.admin-sortable .admin-row-image{aspect-ratio:16/10!important;object-fit:cover}
+/* Floating tile inherits the sortable grid styling, including image crop and fonts. */
+.admin-sortable .admin-drag-ghost{display:grid!important;grid-template-columns:112px minmax(0,1fr) auto!important;align-items:center;gap:16px;padding:0!important;font-family:inherit;overflow:hidden;min-height:0!important}
+.admin-sortable .admin-drag-ghost .admin-row-image{width:112px!important;height:100%!important;min-height:0!important;object-fit:cover}
+.admin-sortable .admin-drag-ghost .admin-row-content{font-family:inherit;min-width:0}
+.admin-sortable .admin-drag-ghost strong{font-family:inherit}
+@media(max-width:740px){.admin-sortable .admin-drag-ghost{grid-template-columns:78px minmax(0,1fr) auto!important;gap:9px}.admin-sortable .admin-drag-ghost .admin-row-image{width:78px!important}}
+/* One scrollbar inside the centered dialog, at the panel's outer edge. */
+.custom-modal:has(.compact-editor){inset:0!important;display:flex!important;align-items:center;justify-content:center;overflow:hidden!important;padding:clamp(12px,3vh,30px)!important;scrollbar-gutter:auto!important}
+.custom-modal .dialog-shell:has(.compact-editor){width:min(700px,100%)!important;min-height:0!important;max-height:min(92dvh,950px)!important;height:auto;overflow:hidden!important;display:flex!important;flex-direction:column;padding:0!important;position:relative;box-shadow:0 20px 65px #0004}
+.custom-modal #content-editor.compact-editor{min-height:0!important;max-height:100%;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:#b6b2ab #f7f6f3;display:flex!important;flex-direction:column;padding:clamp(30px,4vw,45px) clamp(20px,4vw,42px) 0!important}
+.custom-modal #content-editor.compact-editor .form-actions{position:sticky!important;bottom:0;flex-shrink:0;margin-top:auto!important}
+.custom-modal .dialog-shell:has(.compact-editor)>.modal-close{position:absolute;z-index:10;right:12px;top:10px}
+@media(max-width:740px){.custom-modal:has(.compact-editor){padding:10px!important}.custom-modal .dialog-shell:has(.compact-editor){max-height:calc(100dvh - 20px)!important}.custom-modal #content-editor.compact-editor{padding:45px 18px 0!important}}
