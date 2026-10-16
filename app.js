@@ -82,7 +82,7 @@ const container=$(kind+'-list');container.innerHTML=list.length?list.map(p=>'<di
 }
 document.querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>{const [kind,id]=el.dataset.edit.split(':');editor(kind,id)});
 document.querySelectorAll('[data-delete]').forEach(el=>el.onclick=()=>{const [kind,id]=el.dataset.delete.split(':');confirmDialog('Supprimer cet élément ?','Cette action est définitive.',async()=>{await deleteDoc(doc(db,kind,id))})});
-document.querySelectorAll('[data-toggle]').forEach(el=>el.onchange=()=>{const [kind,id]=el.dataset.toggle.split(':');const item=state[kind].find(p=>p.id===id);if(!item)return;const target=el.checked;el.checked=!!item.published;confirmDialog(target?'Publier cet élément ?':'Dépublier cet élément ?',target?'Il sera visible sur le site public.':'Il ne sera plus visible sur le site public.',async()=>{await setDoc(doc(db,kind,id),{published:target,updatedAt:serverTimestamp()},{merge:true});message(target?'Publication confirmée.':'Élément dépublié.')},'Annuler',target?'Publier':'Dépublier')});
+document.querySelectorAll('[data-toggle]').forEach(el=>el.onclick=()=>{const [kind,id]=el.dataset.toggle.split(':');const item=state[kind].find(p=>p.id===id);if(!item)return;const target=!item.published;confirmDialog(target?'Publier cet élément ?':'Dépublier cet élément ?',target?'Il sera visible sur le site public.':'Il ne sera plus visible sur le site public.',async()=>{await setDoc(doc(db,kind,id),{published:target,updatedAt:serverTimestamp()},{merge:true});message(target?'Publication confirmée.':'Élément dépublié.')},'Annuler',target?'Publier':'Dépublier')});
 }
 $('add').onclick=()=>editor('projects');$('add-workshop').onclick=()=>editor('workshops');
 let modalClose=null;
