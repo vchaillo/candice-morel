@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDocs, query, where, onSnapshot, setDoc, deleteDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, collection, doc, query, where, onSnapshot, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const app=initializeApp({apiKey:"AIzaSyAacPZBD_EhHfbPjhaU9vIRJVFzv7ZSu7U",authDomain:"candice-morel.firebaseapp.com",projectId:"candice-morel",storageBucket:"candice-morel.firebasestorage.app",messagingSenderId:"755634623005",appId:"1:755634623005:web:e516ad21721b16569fecf4"});
 const auth=getAuth(app),db=getFirestore(app);
@@ -10,42 +10,6 @@ const $=id=>document.getElementById(id);
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const photo='https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=900&q=80';
 const configs={projects:{label:"Projet",collection:"projects",fields:[["category","Catégorie",["Théâtre","Cinéma","Performance","Écriture","Autre"]],["year","Année",null]]},workshops:{label:"Atelier",collection:"workshops",fields:[["audience","Public",["Enfants","Adolescents","Adultes","Entreprises","Tous publics"]],["format","Format",["Cours collectif","Atelier","Stage","Intervention","Formation"]]]}};
-const initialData={
-projects:[
-{id:"gazes",title:"Gazes",category:"Théâtre",year:"2020",description:"One-woman-show écrit et interprété par Candice Morel, mis en scène par Alexiane Cazenave. Chapel Playhouse, Londres, du 31 janvier au 2 février 2020.",published:true,image:"https://static.wixstatic.com/media/04c902_79195f4bd77948b980cfbf86a401b670~mv2.png"},
-{id:"skewered",title:"Skewered",category:"Théâtre",year:"2018",description:"Double programme de The Paper Theatre, associant Low Level Panic de Clare McIntyre et Cold Loneliness de Candice Morel. The Lion and Unicorn Theatre, Londres, du 9 au 14 avril 2018.",published:true,image:""},
-{id:"next",title:"Projet à venir",category:"Cinéma",year:"2026",description:"Projet fictif de démonstration, non publié.",published:false,image:""}
-],
-workshops:[
-{id:"impro",title:"Cours d’improvisation",audience:"Adultes",format:"Cours collectif",description:"Exercices de jeu, écoute, spontanéité et expression. Informations pratiques à confirmer.",published:true,image:""},
-{id:"kids",title:"Théâtre pour enfants",audience:"Enfants",format:"Atelier",description:"Découverte du jeu théâtral, de l’imaginaire et de l’expression en groupe. Informations pratiques à confirmer.",published:true,image:""},
-{id:"business",title:"Ateliers en entreprise",audience:"Entreprises",format:"Intervention",description:"Improvisation, coopération et prise de parole. Missions et références à documenter.",published:true,image:""}
-]};
-async function importInitialData(){
-if(!state.user||!admins.has(state.user.uid)){message("Connectez-vous avec un compte administrateur autorisé.");return}
-const button=$('import-data');button.disabled=true;button.textContent='Importation…';message('Connexion à Firestore et vérification des documents…');
-let imported=0,skipped=0;const failures=[];
-try{
-for(const kind of Object.keys(initialData)){
-message('Vérification de la collection '+kind+'…');
-let existing;
-try{existing=await getDocs(collection(db,kind))}
-catch(e){failures.push(kind+": lecture refusée ("+(e.code||e.message)+")");continue}
-const ids=new Set(existing.docs.map(d=>d.id));
-for(const item of initialData[kind]){
-message('Importation : '+kind+' / '+item.title+'…');
-if(ids.has(item.id)){skipped++;continue}
-const {id,...data}=item;
-try{await setDoc(doc(db,kind,id),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});imported++}
-catch(e){failures.push(kind+"/"+id+": "+(e.code||e.message))}
-}
-}
-const details=failures.length?" Échecs : "+failures.join(" ; "):"";
-message(imported+" importé(s), "+skipped+" déjà présent(s)."+details);
-}catch(e){message("Erreur d’importation : "+(e.code||e.message))}
-finally{button.disabled=false;button.textContent='Importer les contenus initiaux'}
-}
-document.addEventListener('click',event=>{const button=event.target.closest('#import-data');if(button){event.preventDefault();importInitialData()}});
 function message(text){$('studio-message').textContent=text}
 function showRoute(){const studio=['#studio','#admin'].includes(location.hash),logged=!!state.user;$('site').classList.toggle('hidden',studio);$('studio-login').classList.toggle('hidden',!studio||logged);$('admin').classList.toggle('hidden',!studio||!logged);document.querySelector('header').classList.toggle('header-studio',studio);if(studio)window.scrollTo({top:0,behavior:'instant'});else if(location.hash&&$(location.hash.slice(1)))requestAnimationFrame(()=>$(location.hash.slice(1)).scrollIntoView({block:'start',behavior:'smooth'}))}
 function startSubscriptions(){state.unsubs.forEach(f=>f());state.unsubs=[];for(const kind of Object.keys(configs)){const ref=collection(db,kind);const q=state.user?ref:query(ref,where("published","==",true));state.unsubs.push(onSnapshot(q,snapshot=>{state[kind]=snapshot.docs.map(d=>({id:d.id,...d.data()}));render()},e=>{console.error(e);message("Erreur de chargement Firestore : "+e.message)}))}}
