@@ -121,3 +121,11 @@ test("Book references five local Candice photographs", () => {
   assert.equal((html.match(/assets\/book\/candice-\d\d\.webp/g) || []).length, 5);
   assert.match(html, /05 PHOTOGRAPHIES/);
 });
+
+test("Book slide keeps original header and scrollbars stable", () => {
+  assert.match(html, /class="book-monogram"/);
+  assert.match(css, /html\{scrollbar-gutter:stable\}/);
+  assert.match(css, /body\.book-active\{overflow:visible!important\}/);
+  assert.match(css, /body\.book-active>header\{position:absolute!important/);
+  assert.match(css, /\.book-close:hover svg\{transform:none!important\}/);
+});
