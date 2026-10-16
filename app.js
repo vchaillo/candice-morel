@@ -134,8 +134,8 @@ document.querySelectorAll('[data-toggle]').forEach(el=>el.onclick=()=>{const [ki
 }
 $('add').onclick=()=>editor('projects');$('add-workshop').onclick=()=>editor('workshops');
 let modalClose=null;
-function modal(html){$('modal-root').innerHTML='<div class="modal custom-modal"><div class="dialog-shell"><button type="button" class="modal-close" aria-label="Fermer">×</button>'+html+'</div></div>';$('modal-root').querySelector('.modal-close').onclick=()=>modalClose?.();const overlay=$('modal-root').firstElementChild;overlay.onclick=e=>{if(e.target===overlay)modalClose?.()};}
-function dismiss(){modalClose=null;$('modal-root').replaceChildren()}
+function modal(html){document.body.classList.add('studio-modal-active');$('modal-root').innerHTML='<div class="modal custom-modal"><div class="dialog-shell"><button type="button" class="modal-close" aria-label="Fermer">×</button>'+html+'</div></div>';$('modal-root').querySelector('.modal-close').onclick=()=>modalClose?.();const overlay=$('modal-root').firstElementChild;overlay.onclick=e=>{if(e.target===overlay)modalClose?.()};}
+function dismiss(){modalClose=null;$('modal-root').replaceChildren();document.body.classList.remove('studio-modal-active')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modalClose){e.preventDefault();modalClose()}});
 function confirmDialog(title,description,onConfirm,negative='Annuler',positive='Confirmer'){const old=modalClose;modal('<div class="confirm-icon">!</div><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(description)+'</p><div class="form-actions"><button type="button" class="btn alt" id="confirm-no">'+negative+'</button><button type="button" class="btn" id="confirm-yes">'+positive+'</button></div>');modalClose=()=>{dismiss();};$('confirm-no').onclick=()=>{dismiss()};$('confirm-yes').onclick=async()=>{try{await onConfirm();dismiss()}catch(e){$('confirm-yes').textContent='Erreur : '+e.message}};return old}
 function editor(kind,id){
