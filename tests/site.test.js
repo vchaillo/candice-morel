@@ -263,3 +263,19 @@ test("mobile header keeps CM on the left and Studio actions remain inline", () =
  assert.match(css, /\.admin-sortable \.admin-actions\{grid-column:3!important;grid-row:1!important;display:flex!important;flex-direction:row!important/);
  assert.doesNotMatch(html, /Gérez les projets et les ateliers\. Toutes les modifications sont synchronisées avec Firebase\./);
 });
+
+test("crop zoom limits reflect image resolution and cover fit", () => {
+ assert.match(script, /const configureZoom=\(\)=>\{/);
+ assert.match(script, /const cover=Math\.max\(canvas\.width\/img\.width,canvas\.height\/img\.height\)/);
+ assert.match(script, /zoomInput\.min='100'/);
+ assert.match(script, /zoomInput\.max=String\(Math\.max\(100,Math\.round\(maxUseful\*100\)\)\)/);
+});
+test("mobile navigation and modal modes match their intended layouts", () => {
+ assert.match(html, /class="nav-contact-icon"/);
+ assert.match(css, /body>header nav \.nav-contact-text\{display:none\}/);
+ assert.match(css, /body>header nav\{flex:1 1 auto!important/);
+ assert.match(script, /class="modal-close" aria-label="Fermer"><svg/);
+ assert.match(script, /classList\.add\('is-confirmation'\)/);
+ assert.match(css, /\.custom-modal:not\(\.is-confirmation\) \.dialog-shell\{width:100%!important/);
+ assert.match(css, /\.custom-modal\.is-confirmation\{inset:0!important;display:flex!important;align-items:center!important/);
+});
