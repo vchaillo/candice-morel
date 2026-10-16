@@ -94,3 +94,29 @@ html{scroll-padding-top:0!important}body{overflow-x:hidden}#site>.section{scroll
 .book-lightbox-count{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#ccc;letter-spacing:.18em;font-size:11px}
 @media(max-width:850px){.book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.book-toolbar{margin-top:35px}}
 @media(max-width:520px){.book-page{padding:110px 18px 55px}.book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.book-tile span{font-size:8px;left:9px;bottom:10px}.book-toolbar span:last-child{display:none}.book-lightbox{padding:65px 45px}.book-lightbox button{font-size:25px}.book-lightbox-prev{left:0}.book-lightbox-next{right:0}}
+
+
+/* Header contrast for the dedicated light Book page */
+body:has(#book-page:not(.hidden)) > header{color:#191919;background:#f3f1ed;position:relative;z-index:20}
+body:has(#book-page:not(.hidden)) .book-page{padding-top:clamp(45px,7vw,90px)}
+/* Mobile navigation: keep all five links tappable, without horizontal overflow */
+@media(max-width:740px){
+  header nav{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px 15px;max-width:100%;padding:0 8px}
+  header nav a{display:inline-block;white-space:nowrap;padding:5px 0;min-height:28px}
+  body:has(#book-page:not(.hidden)) > header{padding-bottom:18px}
+  .admin-head{display:flex;flex-direction:column;align-items:stretch}
+  .admin-head .admin-account-actions{order:-1;display:flex;justify-content:flex-end;gap:8px;margin:0 0 26px;flex-wrap:wrap}
+  .admin-account-actions .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:12px;padding:10px 12px}
+}
+.studio-field > svg{flex:none;color:inherit}
+#toggle-password{display:inline-flex;align-items:center;justify-content:center;min-width:40px;color:inherit}
+#toggle-password .eye-hidden{display:none}
+#toggle-password.password-visible .eye-visible{display:none}
+#toggle-password.password-visible .eye-hidden{display:block}
+#studio-login .studio-back,#studio-login .studio-login-return{display:inline-flex;align-items:center;gap:7px}
+.studio-submit .link-arrow,.studio-google .link-arrow,.admin-account-actions .link-arrow{vertical-align:middle}
+.admin-actions{display:flex;align-items:center;gap:7px}
+.admin-actions button[data-toggle],.admin-actions button[data-edit],.admin-actions button[data-delete]{appearance:none;-webkit-appearance:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:9px;border:1px solid #e6e2dc;background:transparent;color:#191919!important;border-radius:50%;font-size:0;line-height:1;cursor:pointer}
+.admin-actions button svg{width:20px;height:20px;display:block;stroke:currentColor}
+.admin-actions button:hover{background:#f0eeea}
+.admin-actions button:focus-visible{outline:2px solid #191919;outline-offset:2px}
