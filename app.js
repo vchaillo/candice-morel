@@ -27,7 +27,33 @@ document.addEventListener('click',event=>{const el=event.target.closest('[data-s
 document.addEventListener('keydown',event=>{const el=event.target.closest?.('[data-site-text]');if(el&&state.user&&!editingNode&&(event.key==='Enter'||event.key===' ')){event.preventDefault();beginTextEdit(el)}});
 const configs=CONTENT_CONFIG;
 function message(text){if(!text)return;const stack=$('toast-stack');if(!stack)return;const toast=document.createElement('div');toast.className='site-toast'+(/erreur|impossible|refus|échec/i.test(text)?' toast-error':'');const content=document.createElement('span');content.textContent=text;const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label','Fermer la notification');toast.append(content,close);stack.append(toast);const remove=()=>{if(!toast.isConnected)return;toast.classList.add('toast-out');setTimeout(()=>toast.remove(),230)};close.onclick=remove;setTimeout(remove,4600);while(stack.children.length>4)stack.firstElementChild.remove()}
-function showRoute(){const studio=['#studio','#admin'].includes(location.hash),book=location.hash==='#book',logged=!!state.user;$('site').classList.toggle('hidden',studio||book);$('book-page').classList.toggle('hidden',!book);$('studio-login').classList.toggle('hidden',!studio||logged);$('admin').classList.toggle('hidden',!studio||!logged);document.querySelector('header').classList.toggle('header-studio',studio);if(studio||book||!location.hash||location.hash==='#home')window.scrollTo(0,0);else if(location.hash&&$(location.hash.slice(1)))requestAnimationFrame(()=>$(location.hash.slice(1)).scrollIntoView({block:'start',behavior:'smooth'}))}
+let bookPreviouslyOpen=false;
+let bookReturnHash='#home';
+function showRoute(){
+  const studio=['#studio','#admin'].includes(location.hash);
+  const book=location.hash==='#book';
+  const logged=!!state.user;
+  const overlay=$('book-page');
+  if(book&&!bookPreviouslyOpen){
+    const previous=sessionStorage.getItem('book-return-hash');
+    bookReturnHash=previous&&previous!=='#book'?previous:bookReturnHash;
+    overlay.scrollTop=0;
+    overlay.querySelector('.book-scroll').scrollTop=0;
+  }
+  if(!book&&bookPreviouslyOpen)closeBookImage();
+  bookPreviouslyOpen=book;
+  overlay.classList.toggle('book-open',book);
+  overlay.setAttribute('aria-hidden',String(!book));
+  overlay.inert=!book;
+  document.body.classList.toggle('book-active',book);
+  $('site').classList.toggle('hidden',studio);
+  $('studio-login').classList.toggle('hidden',!studio||logged);
+  $('admin').classList.toggle('hidden',!studio||!logged);
+  document.querySelector('header').classList.toggle('header-studio',studio);
+  if(studio)window.scrollTo(0,0);
+  else if(!book&&(!location.hash||location.hash==='#home'))window.scrollTo(0,0);
+  else if(!book&&location.hash&&$(location.hash.slice(1)))requestAnimationFrame(()=>$(location.hash.slice(1)).scrollIntoView({block:'start',behavior:'smooth'}));
+}
 
 // Book: keyboard-accessible image viewer with history-friendly hash routing.
 const bookImages=[...document.querySelectorAll('.book-tile img')];
@@ -59,6 +85,16 @@ document.addEventListener('keydown',event=>{
   if(event.key==='ArrowRight'){event.preventDefault();openBookImage(bookIndex+1)}
 });
 window.addEventListener('hashchange',closeBookImage);
+document.querySelectorAll('a[href="#book"]').forEach(link=>link.addEventListener('click',()=>{
+  if(location.hash!=='#book'){
+    bookReturnHash=location.hash&&location.hash!=='#book'?location.hash:'#home';
+    sessionStorage.setItem('book-return-hash',bookReturnHash);
+  }
+}));
+$('book-page').querySelector('.book-close').addEventListener('click',()=>{
+  location.hash=bookReturnHash&&bookReturnHash!=='#book'?bookReturnHash:'#home';
+});
+
 
 function startSubscriptions(){state.unsubs.forEach(f=>f());state.unsubs=[];for(const kind of Object.keys(configs)){const ref=collection(db,kind);const q=state.user?ref:query(ref,where("published","==",true));state.unsubs.push(onSnapshot(q,snapshot=>{state[kind]=snapshot.docs.map(d=>({id:d.id,...d.data()}));render()},e=>{console.error(e);message("Erreur de chargement Firestore : "+e.message)}))}}
 async function signIn(fn){$('login-error').textContent='';try{const result=await fn();if(!isAuthorizedAdmin(result.user,admins)){await signOut(auth);throw new Error("Ce compte n'est pas autorisé à accéder au Studio.")}}catch(e){$('login-error').textContent=e.code==='auth/unauthorized-domain'?"Ajoutez vchaillo.github.io aux domaines autorisés dans Firebase.":e.message||"Connexion impossible."}}
