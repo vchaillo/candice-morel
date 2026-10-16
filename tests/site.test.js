@@ -103,3 +103,16 @@ test("Book opens as an inert, closable overlay with its own scrolling area", () 
   assert.match(css, /\.book-page\.book-open/);
   assert.match(css, /\.book-scroll\{height:100%;overflow-y:auto/);
 });
+
+test("Book is a modal with a bare close icon and no section number", () => {
+  assert.match(html, /id="book-page" role="dialog" aria-modal="true"/);
+  assert.doesNotMatch(html, /PORTFOLIO PHOTOGRAPHIQUE · 05/);
+  assert.match(css, /\.book-page\{z-index:9000!important/);
+  assert.match(css, /\.book-close\{border:0!important/);
+  assert.match(script, /event\.key==='Escape'\)\{event\.preventDefault\(\);location\.hash=bookReturnHash/);
+});
+
+test("mobile contact form precedes the name and social links", () => {
+  assert.match(css, /\.contact-footer-form\{order:0;width:100%\}/);
+  assert.match(css, /\.contact-footer-brand\{order:1;width:100%/);
+});
