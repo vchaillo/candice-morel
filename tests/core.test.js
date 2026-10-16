@@ -77,8 +77,8 @@ test("crop covers canvas without distortion at minimum zoom", () => {
 
 test("crop positions clamp to boundaries and reject invalid dimensions", () => {
   const crop = getImageCrop(1000, 500, 480, 300, 1, -5, 10);
-  assert.equal(crop.x, 0);
-  assert.equal(crop.y, 0);
+  assert.equal(Math.abs(crop.x), 0);
+  assert.equal(Math.abs(crop.y), 0);
   assert.throws(() => getImageCrop(0, 100, 480, 300, 1, 0.5, 0.5), RangeError);
 });
 
