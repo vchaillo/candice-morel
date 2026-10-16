@@ -190,7 +190,7 @@ function bindSortable(container,kind){
      ghost.classList.add('admin-drag-ghost');
      ghost.removeAttribute('data-row-id');
      Object.assign(ghost.style,{position:'fixed',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',margin:'0',zIndex:'9999',pointerEvents:'none'});
-     document.body.append(ghost);
+     container.append(ghost);
      row.classList.add('admin-drag-source');
      container.classList.add('is-sorting');
     }
