@@ -839,14 +839,15 @@ body.studio-modal-active{overflow:hidden!important}
  body.mobile-menu-open{overflow:hidden}
  body.mobile-menu-open>header{z-index:9506!important;color:#fff!important}
  body.mobile-menu-open>header .header-monogram{color:#fff!important}
- /* Account buttons: absolute coordinates relative to Studio, not title flow. */
- #admin.admin{position:relative!important;padding-top:145px!important}
+ /* The Studio follows a 66px-high header in normal document flow.
+    Keep account actions in flow too: no second header-sized offset. */
+ #admin.admin{position:relative!important;padding-top:12px!important}
+ #admin .admin-head{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:14px!important}
  #admin .admin-head .admin-account-actions{
-  position:absolute!important;top:78px!important;right:14px!important;
-  margin:0!important;order:0!important;align-self:auto!important;
+  position:static!important;top:auto!important;right:auto!important;
+  margin:0!important;order:-1!important;align-self:flex-end!important;
   display:flex!important;flex-wrap:nowrap!important;gap:8px!important;
  }
- #admin .admin-head{gap:12px!important}
 }
 @media(prefers-reduced-motion:reduce){
  .mobile-navigation,.mobile-menu-toggle span{transition:none!important}
