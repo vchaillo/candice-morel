@@ -29,6 +29,12 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // Book photographs, including unpublished drafts visible only to admins
+    match /book/{photoId} {
+      allow read: if isAdmin() || isPublished();
+      allow create, update, delete: if isAdmin();
+    }
+
     // Public site content: titles, descriptions and introductions
     match /siteContent/introductions {
       allow read: if true;
