@@ -281,7 +281,7 @@ $('import-book').onclick=()=>{
   const batch=writeBatch(db);
   tiles.forEach((tile,index)=>{
    const image=tile.querySelector('img');
-   const title=(tile.querySelector('span')?.textContent||'').replace(/^\\d+\\s*\\/\\s*/,'')||'Photographie '+(index+1);
+   const title=(tile.querySelector('span')?.textContent||'').replace(/^[0-9]+\s*\/\s*/,'')||'Photographie '+(index+1);
    batch.set(doc(db,'book',crypto.randomUUID()),{title,description:'',image:image?.getAttribute('src')||'',published:true,sortOrder:index,updatedAt:serverTimestamp()});
   });
   await batch.commit();await setDoc(doc(db,'siteContent','introductions'),{bookManaged:true},{merge:true});bookCollectionManaged=true;message('Photos importées dans le Studio.');
