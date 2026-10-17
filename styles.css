@@ -972,3 +972,37 @@ body.studio-modal-active{overflow:hidden!important}
  #admin .admin-sortable.is-reordering .admin-row{padding-left:28px!important}
  #admin .admin-sortable.admin-view-cards.is-reordering .admin-row{padding-left:0!important}
 }
+
+/* Final mobile Studio editor rhythm: stable modal and comfortably separated fields. */
+#admin .admin-sort-toggle{margin:0 7px 0 0!important;border-left:0!important;border-right:1px solid #d7d3cc!important;padding-right:10px!important}
+#admin .admin-sortable.is-reordering .admin-drag-handle{background:#fff!important;border:1px solid #e5e2dd!important;border-radius:4px!important;box-shadow:0 1px 4px #00000012!important;left:5px!important;top:50%!important;transform:translateY(-50%)!important;width:23px!important;height:29px!important}
+#admin .admin-sortable.admin-view-cards.is-reordering .admin-drag-handle{left:8px!important;top:10px!important;transform:none!important}
+.custom-modal .compact-editor .publish-status-label{display:inline-block;min-width:0}
+.custom-modal .compact-editor .editor-published{min-height:44px!important;flex-shrink:0!important}
+@media(max-width:740px){
+ .custom-modal:has(.compact-editor){align-items:stretch!important;justify-content:stretch!important;padding:0!important;inset:0!important}
+ .custom-modal:not(.is-confirmation) .dialog-shell:has(.compact-editor){
+  width:100%!important;height:100dvh!important;max-height:100dvh!important;min-height:100dvh!important;
+  margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;
+  overflow:hidden!important;position:relative!important;
+ }
+ .custom-modal:not(.is-confirmation) #content-editor.compact-editor{
+  flex:1 1 auto!important;min-height:0!important;height:100%!important;max-height:100%!important;
+  overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  gap:18px!important;padding:66px 20px 26px!important;box-sizing:border-box!important;
+ }
+ .custom-modal #content-editor.compact-editor>.editor-field,
+ .custom-modal #content-editor.compact-editor>.choice-field,
+ .custom-modal #content-editor.compact-editor>.editor-description,
+ .custom-modal #content-editor.compact-editor>.editor-media,
+ .custom-modal #content-editor.compact-editor>.editor-published{margin:0!important;flex:0 0 auto!important}
+ .custom-modal #content-editor.compact-editor>.editor-field input,
+ .custom-modal #content-editor.compact-editor>.editor-field textarea{margin-top:9px!important}
+ .custom-modal #content-editor.compact-editor>.choice-field .choice-list{margin-top:11px!important}
+ .custom-modal #content-editor.compact-editor>.editor-media{gap:15px!important}
+ .custom-modal #content-editor.compact-editor>.editor-published{margin:2px 0!important;min-height:44px!important}
+ .custom-modal #content-editor.compact-editor>.form-actions{
+  position:static!important;flex-shrink:0!important;margin-top:auto!important;padding:18px 0 10px!important;
+ }
+}
