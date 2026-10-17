@@ -689,3 +689,87 @@ body.studio-modal-active{overflow:hidden!important}
  width:12px;height:12px;border-radius:50%;background:#171717;
  border:2px solid #f5f3ef;box-shadow:0 0 0 1px #171717;
 }
+
+
+/* One-line mobile navigation, retaining the established readable type size. */
+@media(max-width:740px){
+ body>header,body.book-active>header{
+   display:flex!important;flex-direction:row!important;align-items:center!important;
+   justify-content:space-between!important;flex-wrap:nowrap!important;
+   padding:12px 12px!important;gap:8px!important;
+ }
+ body>header .header-monogram,body.book-active>header .header-monogram{
+   width:38px!important;height:38px!important;flex:0 0 38px!important;align-self:center!important;
+ }
+ body>header .header-monogram svg{width:38px!important;height:38px!important}
+ body>header nav,body.book-active>header nav{
+   flex:1 1 auto!important;min-width:0!important;width:auto!important;
+   display:flex!important;flex-wrap:nowrap!important;justify-content:space-between!important;
+   align-items:center!important;align-self:center!important;
+   gap:clamp(3px,1vw,9px)!important;
+   font-size:12px!important;letter-spacing:0!important;margin:0!important;padding:0!important;
+ }
+ body>header nav a{flex-shrink:0!important;white-space:nowrap!important;padding:8px 0!important}
+ body>header nav .nav-contact-text{display:inline!important}
+ body>header nav .nav-contact-icon{display:none!important}
+ .book-monogram{top:12px!important;left:12px!important;width:38px!important;height:38px!important}
+ .book-monogram .header-cm{width:38px!important;height:38px!important}
+ /* Header is 62px tall; 12px of breathing room to the first action. */
+ #admin.admin{padding-top:74px!important}
+ #admin .admin-head .admin-account-actions{margin:0!important;align-self:flex-end!important}
+}
+@media(max-width:390px){
+ body>header,body.book-active>header{padding-left:8px!important;padding-right:8px!important;gap:5px!important}
+ body>header nav,body.book-active>header nav{gap:2px!important}
+ body>header .header-monogram,body.book-active>header .header-monogram{width:34px!important;height:34px!important;flex-basis:34px!important}
+ body>header .header-monogram svg{width:34px!important;height:34px!important}
+ .book-monogram{left:8px!important;width:34px!important;height:34px!important}
+ .book-monogram .header-cm{width:34px!important;height:34px!important}
+}
+/* List/cards switcher: two restrained SVG buttons, hidden on phones. */
+.admin-view-switch{display:flex;align-items:center;gap:4px;margin-left:auto}
+.admin-view-button{
+ width:38px;height:38px;display:grid;place-items:center;
+ border:1px solid #dedad3;background:transparent;color:#777;
+ cursor:pointer;transition:background .18s,color .18s,border-color .18s;
+}
+.admin-view-button:hover{background:#eae7e1;color:#151515}
+.admin-view-button.is-active{background:#151515;color:#fff;border-color:#151515}
+.admin-view-button:focus-visible{outline:2px solid #151515;outline-offset:3px}
+.admin-view-button svg{display:block}
+@media(min-width:741px){
+ .admin-sortable.admin-view-cards{
+   display:grid!important;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));
+   gap:20px!important;align-items:stretch;
+ }
+ .admin-sortable.admin-view-cards .admin-row,
+ .admin-sortable.admin-view-cards .admin-drag-ghost{
+   display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+   grid-template-rows:auto 1fr!important;gap:0!important;
+   width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+   margin:0!important;padding:0!important;overflow:hidden!important;align-items:start!important;
+ }
+ .admin-sortable.admin-view-cards .admin-row-image,
+ .admin-sortable.admin-view-cards .admin-drag-ghost .admin-row-image{
+   grid-column:1/-1!important;grid-row:1!important;
+   width:100%!important;height:auto!important;min-height:0!important;
+   aspect-ratio:16/10!important;object-fit:cover!important;align-self:stretch!important;
+ }
+ .admin-sortable.admin-view-cards .admin-row-content{
+   grid-column:1!important;grid-row:2!important;padding:18px 8px 20px 18px!important;
+   align-self:center!important;
+ }
+ .admin-sortable.admin-view-cards .admin-row-content strong{font-size:17px!important}
+ .admin-sortable.admin-view-cards .admin-row-content small{
+   display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+   white-space:normal!important;line-height:1.45;margin-top:7px;
+ }
+ .admin-sortable.admin-view-cards .admin-actions{
+   grid-column:2!important;grid-row:2!important;
+   display:flex!important;flex-direction:row!important;align-self:center!important;
+   padding:0 12px 0 0!important;gap:4px!important;
+ }
+ .admin-sortable.admin-view-cards .admin-actions button{width:29px!important;height:29px!important;padding:5px!important}
+ .admin-sortable.admin-view-cards .admin-drop-placeholder{min-height:240px}
+}
+@media(max-width:740px){.admin-view-switch{display:none!important}}
