@@ -1075,3 +1075,10 @@ body.studio-modal-active{overflow:hidden!important}
 /* Studio thumbnails: monochrome in list and card views, without altering source files. */
 #admin .admin-sortable .admin-row-image,
 #admin .admin-sortable .admin-drag-ghost .admin-row-image{filter:grayscale(100%)!important}
+
+/* Only the dedicated handle advertises dragging; ordinary Studio cards use the default cursor. */
+#admin .admin-sortable:not(.is-sorting) .admin-row,
+#admin .admin-sortable:not(.is-sorting) .admin-row:hover,
+#admin .admin-sortable:not(.is-sorting) .admin-row:active{cursor:default!important}
+#admin .admin-sortable.is-reordering .admin-drag-handle{cursor:grab!important}
+#admin .admin-sortable.is-reordering .admin-drag-handle:active{cursor:grabbing!important}
