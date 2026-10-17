@@ -1071,3 +1071,7 @@ body.studio-modal-active{overflow:hidden!important}
  #admin .admin-stats-toolbar .admin-view-switch{margin-top:0!important;margin-bottom:0!important}
  #admin .admin-stats-toolbar + [id$="-list"]{margin-top:14px!important}
 }
+
+/* Studio thumbnails: monochrome in list and card views, without altering source files. */
+#admin .admin-sortable .admin-row-image,
+#admin .admin-sortable .admin-drag-ghost .admin-row-image{filter:grayscale(100%)!important}
