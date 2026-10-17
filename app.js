@@ -211,6 +211,7 @@ function bindSortable(container,kind){
      placeholder=document.createElement('div');
      placeholder.className='admin-drop-placeholder';
      placeholder.style.height=rect.height+'px';
+     placeholder.style.setProperty('--placeholder-height',rect.height+'px');
      placeholder.style.width=rect.width+'px';
      row.replaceWith(placeholder);
      ghost=row.cloneNode(true);
@@ -231,8 +232,8 @@ function bindSortable(container,kind){
      // Grid ordering follows the actual two-dimensional card positions.
      for(const other of others){
       const rect=other.getBoundingClientRect();
-      if(e.clientY<rect.bottom&&e.clientX<rect.right){
-       if(e.clientY<rect.top+rect.height/2||e.clientX<rect.left+rect.width/2){before=other;break}
+      if(e.clientY<rect.top||(e.clientY<=rect.bottom&&e.clientX<rect.left+rect.width/2)){
+       before=other;break;
       }
      }
     }else{
