@@ -279,3 +279,12 @@ test("mobile navigation and modal modes match their intended layouts", () => {
  assert.match(css, /\.custom-modal:not\(\.is-confirmation\) \.dialog-shell\{width:100%!important/);
  assert.match(css, /\.custom-modal\.is-confirmation\{inset:0!important;display:flex!important;align-items:center!important/);
 });
+
+test("mobile Studio uses image-first cards with content and actions below", () => {
+ assert.match(css, /#admin\.admin\{padding-top:73px!important\}/);
+ assert.match(css, /#admin \.admin-sortable \.admin-row-image,/);
+ assert.match(css, /grid-column:1\/-1!important;grid-row:1!important/);
+ assert.match(css, /grid-column:1!important;grid-row:2!important/);
+ assert.match(css, /grid-column:2!important;grid-row:2!important/);
+ assert.match(css, /-webkit-line-clamp:2/);
+});
