@@ -621,3 +621,71 @@ body.studio-modal-active{overflow:hidden!important}
  #admin .admin-sortable .admin-actions{gap:3px!important;padding-right:10px!important}
  #admin .admin-sortable .admin-actions button{flex-basis:27px!important;width:27px!important;height:27px!important}
 }
+
+
+/* Mobile: restore legible text navigation, without the envelope icon. */
+@media(max-width:740px){
+ body>header{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:4px!important;padding:12px 14px!important;text-align:left!important}
+ body>header .header-monogram{align-self:flex-start!important;width:42px!important;height:42px!important;flex:0 0 42px!important}
+ body>header .header-monogram svg{width:42px!important;height:42px!important}
+ body>header nav{display:flex!important;flex:0 0 auto!important;width:100%!important;justify-content:space-between!important;align-self:stretch!important;gap:7px!important;flex-wrap:nowrap!important;font-size:clamp(10px,2.65vw,12px)!important;letter-spacing:.07em!important}
+ body>header nav a{padding:8px 0!important}
+ body>header nav .nav-contact-text{display:inline!important}
+ body>header nav .nav-contact-icon{display:none!important}
+ /* Opening Book must not alter the underlying header geometry. */
+ body.book-active>header{padding:12px 14px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:4px!important}
+ body.book-active>header .header-monogram{align-self:flex-start!important}
+ body.book-active>header nav{display:flex!important;flex-wrap:nowrap!important}
+ .book-monogram{top:12px!important;left:14px!important;width:42px;height:42px}
+ .book-monogram .header-cm{width:42px;height:42px}
+ /* The first Studio controls sit below the two-row header. */
+ #admin.admin{padding-top:112px!important}
+}
+@media(max-width:360px){body>header nav{font-size:9.5px!important;letter-spacing:0!important;gap:5px!important}}
+/* Simple cross icon shared by every Studio modal, no circle or hover motion. */
+.custom-modal .modal-close,
+.custom-modal .dialog-shell:has(.studio-profile)>.modal-close{
+ width:44px!important;height:44px!important;border:0!important;border-radius:0!important;
+ background:transparent!important;color:#171717!important;box-shadow:none!important;
+ transform:none!important;transition:none!important;display:grid!important;place-items:center!important;
+}
+.custom-modal .modal-close:hover,
+.custom-modal .modal-close:active,
+.custom-modal .dialog-shell:has(.studio-profile)>.modal-close:hover{
+ background:transparent!important;transform:none!important;color:inherit!important;
+}
+.custom-modal .dialog-shell:has(.studio-profile)>.modal-close{color:#f5f3ef!important}
+.custom-modal .modal-close svg{transition:none!important;transform:none!important}
+@media(max-width:740px){
+ /* Close belongs to the dialog's top edge and scrolls with the dialog. */
+ .custom-modal:not(.is-confirmation) .modal-close{position:absolute!important;top:12px!important;right:14px!important;z-index:5!important}
+ .custom-modal:not(.is-confirmation) .dialog-shell{position:relative!important}
+ .custom-modal:not(.is-confirmation) .dialog-shell:has(.compact-editor){overflow-y:auto!important;display:block!important}
+ .custom-modal:not(.is-confirmation) #content-editor.compact-editor{max-height:none!important;overflow:visible!important;padding:65px 20px 25px!important;display:block!important}
+ .custom-modal:not(.is-confirmation) .dialog-shell:has(.studio-profile)>.modal-close{position:absolute!important}
+}
+/* Book-like vertical entrance, limited to the account profile. */
+.custom-modal.is-profile .dialog-shell{transform:translate3d(0,-105vh,0);opacity:.8;transition:transform .75s cubic-bezier(.76,0,.16,1),opacity .55s ease}
+.custom-modal.is-profile.profile-entered .dialog-shell{transform:translate3d(0,0,0);opacity:1}
+@media(prefers-reduced-motion:reduce){.custom-modal.is-profile .dialog-shell{transition:none!important;transform:none!important;opacity:1!important}}
+/* Zoom: align visible rail ends with thumb centers at both limits. */
+.compact-editor .zoom-control{min-width:0!important}
+.compact-editor #crop-zoom{
+ -webkit-appearance:none!important;appearance:none!important;
+ display:block!important;box-sizing:border-box!important;flex:1 1 auto!important;
+ min-width:0!important;width:100%!important;height:24px!important;
+ margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+ background:linear-gradient(#a8a39c,#a8a39c) center/ calc(100% - 16px) 2px no-repeat!important;
+ cursor:pointer;
+}
+.compact-editor #crop-zoom::-webkit-slider-runnable-track{height:24px;background:transparent;border:0}
+.compact-editor #crop-zoom::-moz-range-track{height:2px;background:transparent;border:0}
+.compact-editor #crop-zoom::-webkit-slider-thumb{
+ -webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;
+ background:#171717;border:2px solid #f5f3ef;box-shadow:0 0 0 1px #171717;
+ margin-top:4px;
+}
+.compact-editor #crop-zoom::-moz-range-thumb{
+ width:12px;height:12px;border-radius:50%;background:#171717;
+ border:2px solid #f5f3ef;box-shadow:0 0 0 1px #171717;
+}
