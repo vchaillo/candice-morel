@@ -10,6 +10,7 @@ export const CONTENT_CONFIG = Object.freeze({
       ["year", "Année", null],
     ],
   }),
+  book: Object.freeze({ label: "Photographie", fields: [] }),
   workshops: Object.freeze({
     label: "Atelier",
     fields: [
