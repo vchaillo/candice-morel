@@ -295,7 +295,8 @@ function renderBook(published){
  bookImages=[...grid.querySelectorAll('.book-tile img')];
  $('book-count').textContent=String(published.length).padStart(2,'0')+' PHOTOGRAPHIES';
 }
-const adminViews={projects:'list',workshops:'list',book:'list'};
+const defaultAdminView=window.matchMedia('(max-width:740px)').matches?'cards':'list';
+const adminViews={projects:defaultAdminView,workshops:defaultAdminView,book:defaultAdminView};
 const adminSortModes={projects:false,workshops:false,book:false};
 const adminFilters={projects:'total',workshops:'total',book:'total'};
 const sortCheckIcon='<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>';
@@ -316,6 +317,12 @@ document.querySelectorAll('.admin-stats').forEach(stats=>stats.addEventListener(
  adminFilters[kind]=button.dataset.filter;
  render();
 }));
+document.querySelectorAll('[data-view]').forEach(button=>{
+ const [kind,view]=button.dataset.view.split(':');
+ const active=adminViews[kind]===view;
+ button.classList.toggle('is-active',active);
+ button.setAttribute('aria-pressed',String(active));
+});
 document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
  const [kind,view]=button.dataset.view.split(':');
  if(!['projects','workshops','book'].includes(kind)||!['list','cards'].includes(view))return;
