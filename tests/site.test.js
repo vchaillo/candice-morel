@@ -161,7 +161,7 @@ test("Admin rows expose compact metadata and sortable controls", () => {
  assert.doesNotMatch(script, /formatAdminDate\(p\)/);
  assert.match(script, /function bindSortable\(container,kind\)/);
  assert.match(script, /function animateReorder\(container,change\)/);
- assert.match(script, /writeBatch\(db\)/);
+ assert.match(script, /function renderBook\(published\)/);
  assert.match(script, /sortOrder:i/);
  assert.match(script, /event\.key==='ArrowUp'/);
 });
@@ -338,7 +338,7 @@ test("Book management is integrated into Studio and protected by Firestore rules
  assert.match(html, /id="add-book"/);
  assert.match(html, /id="book-list"/);
  assert.match(html, /id="book-stats"/);
- assert.match(html, /id="import-book"/);
+ assert.doesNotMatch(html, /id="import-book"/);
  assert.match(script, /function renderBook\(published\)/);
  assert.match(script, /editor\('book'\)/);
  assert.match(script, /writeBatch\(db\)/);
@@ -350,4 +350,12 @@ test("mobile navigation keeps its header layer through the closing transition", 
  assert.match(script, /mobileMenu\?\.addEventListener\('transitionend'/);
  assert.match(css, /body\.mobile-menu-transition>header/);
  assert.match(css, /height:1\.5px!important;flex:0 0 1\.5px!important/);
+});
+
+test("Book editor omits description and photo controls follow the zoom", () => {
+ assert.match(script, /kind==='book'\?'':'<label class="editor-field editor-description">/);
+ assert.match(script, /const updateZoomTrack=/);
+ assert.match(script, /Math\.max\(3,Math\.min\(6,1\/cover\)\)/);
+ assert.match(css, /--zoom-progress:0%/);
+ assert.match(css, /#admin \.admin-sortable\.admin-view-cards \.admin-drag-ghost/);
 });
