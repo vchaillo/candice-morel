@@ -268,7 +268,7 @@ test("crop zoom limits reflect image resolution and cover fit", () => {
  assert.match(script, /const configureZoom=\(\)=>\{/);
  assert.match(script, /const cover=Math\.max\(canvas\.width\/img\.width,canvas\.height\/img\.height\)/);
  assert.match(script, /zoomInput\.min='100'/);
- assert.match(script, /zoomInput\.max=String\(Math\.max\(100,Math\.round\(maxUseful\*100\)\)\)/);
+ assert.match(script, /zoomInput\.max=String\(Math\.round\(maxUseful\*100\)\)/);
 });
 test("mobile navigation and modal modes match their intended layouts", () => {
  assert.match(html, /class="nav-contact-icon"/);
