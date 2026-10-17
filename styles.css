@@ -877,3 +877,16 @@ body.studio-modal-active{overflow:hidden!important}
  .book-admin-create .btn{font-size:11px;padding:11px 12px}
  #book-list .admin-row-content small{display:none!important}
 }
+
+/* v3.13.7: stronger, balanced hamburger and close glyph. */
+@media(max-width:740px){
+ .mobile-menu-toggle{width:46px!important;height:46px!important;padding:11px 8px!important;justify-content:center!important;gap:6px!important}
+ .mobile-menu-toggle span{
+  width:29px!important;height:2.5px!important;flex:0 0 2.5px!important;
+  border-radius:2px!important;background:currentColor!important;
+  transform-origin:center!important;
+ }
+ .mobile-menu-toggle.is-open span:first-child{transform:translateY(8.5px) rotate(45deg)!important}
+ .mobile-menu-toggle.is-open span:nth-child(2){opacity:0!important}
+ .mobile-menu-toggle.is-open span:last-child{transform:translateY(-8.5px) rotate(-45deg)!important}
+}
