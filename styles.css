@@ -866,3 +866,14 @@ body.studio-modal-active{overflow:hidden!important}
  color:#f5f3ef!important;background:transparent!important;
  transform:none!important;border:0!important;box-shadow:none!important;
 }
+
+
+/* Book management follows the existing Studio patterns. */
+.book-admin-create{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.book-admin-create .btn{white-space:nowrap}
+#book-list .admin-row-image{background:#ebe8e2}
+@media(max-width:740px){
+ .book-admin-create{width:100%;justify-content:flex-start;gap:8px}
+ .book-admin-create .btn{font-size:11px;padding:11px 12px}
+ #book-list .admin-row-content small{display:none!important}
+}
