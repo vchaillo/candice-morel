@@ -890,3 +890,23 @@ body.studio-modal-active{overflow:hidden!important}
  .mobile-menu-toggle.is-open span:nth-child(2){opacity:0!important}
  .mobile-menu-toggle.is-open span:last-child{transform:translateY(-8.5px) rotate(-45deg)!important}
 }
+
+/* Mobile navigation: fine three-line glyph and uninterrupted header on exit. */
+@media(max-width:740px){
+ .mobile-menu-toggle span{
+  height:1.5px!important;flex:0 0 1.5px!important;
+  width:28px!important;border-radius:1px!important;
+ }
+ .mobile-menu-toggle{gap:6px!important}
+ .mobile-menu-toggle.is-open span:first-child{transform:translateY(7.5px) rotate(45deg)!important}
+ .mobile-menu-toggle.is-open span:last-child{transform:translateY(-7.5px) rotate(-45deg)!important}
+ body.mobile-menu-transition>header{
+  z-index:9506!important;color:#fff!important;
+ }
+ body.mobile-menu-transition>header .header-monogram{color:#fff!important}
+ body.mobile-menu-transition .mobile-menu-toggle{color:#fff!important}
+ body.mobile-menu-transition:not(.mobile-menu-open)>header{
+  /* Header stays visible while the dark panel slides away. */
+  transition:color .25s ease .55s;
+ }
+}
