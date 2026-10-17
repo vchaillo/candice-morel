@@ -221,10 +221,23 @@ function bindSortable(container,kind){
   });
  }
 }
+const adminViews={projects:'list',workshops:'list'};
+document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
+ const [kind,view]=button.dataset.view.split(':');
+ if(!['projects','workshops'].includes(kind)||!['list','cards'].includes(view))return;
+ adminViews[kind]=view;
+ const container=$(kind+'-list');
+ container.classList.toggle('admin-view-cards',view==='cards');
+ document.querySelectorAll('[data-view^="'+kind+':"]').forEach(control=>{
+  const active=control.dataset.view===kind+':'+view;
+  control.classList.toggle('is-active',active);
+  control.setAttribute('aria-pressed',String(active));
+ });
+}));
 function render(){
 for(const kind of Object.keys(configs)){const list=state[kind],published=visibleItems(list);const grid=$(kind==='projects'?'project-grid':'workshop-grid');grid.innerHTML=published.length?published.map(p=>'<article><div class="image"><img loading="lazy" src="'+escapeHtml(p.image||photo)+'" alt="'+escapeHtml(p.title)+'"></div><h3>'+escapeHtml(p.title)+'</h3><p>'+escapeHtml(kind==='projects'?(p.category||'Projet')+' · '+(p.year||''):(p.audience||'')+' · '+(p.format||''))+'</p><div class="item-description">'+escapeHtml(p.description||'')+'</div></article>').join(''):'<p>Aucun contenu publié pour le moment.</p>';
 const stats=$(kind+'-stats');const counts=contentStats(list);stats.innerHTML=[['Total',counts.total],['Publiés',counts.published],['Brouillons',counts.drafts]].map(([label,n])=>'<div class="stat"><b>'+n+'</b><span>'+label+'</span></div>').join('');
-const container=$(kind+'-list');container.classList.add('admin-sortable');container.dataset.kind=kind;container.innerHTML=list.length?list.map(p=>'<div class="admin-row" data-row-id="'+escapeHtml(p.id)+'"><img class="admin-row-image" src="'+escapeHtml(p.image||photo)+'" alt="" loading="lazy"><div class="admin-row-content"><strong>'+escapeHtml(p.title)+'</strong><small>'+escapeHtml(p.description||'Aucune description')+'</small><div class="admin-row-meta">'+(kind==='projects'?'<span>'+escapeHtml(p.category||'Projet')+'</span><span>'+escapeHtml(p.year||'Année non renseignée')+'</span>':'<span>'+escapeHtml(p.audience||'Tous publics')+'</span><span>'+escapeHtml(p.format||'Atelier')+'</span>')+'</div></div><div class="admin-actions"><button type="button" data-toggle="'+kind+':'+escapeHtml(p.id)+'" aria-label="'+(p.published?'Dépublier':'Publier')+'" title="'+(p.published?'Publié — masquer':'Brouillon — publier')+'">'+(p.published?visibilityIcon:hiddenIcon)+'</button><button type="button" data-edit="'+kind+':'+escapeHtml(p.id)+'" aria-label="Modifier" title="Modifier">'+pencilIcon+'</button><button data-delete="'+kind+':'+escapeHtml(p.id)+'" aria-label="Supprimer">'+trashIcon+'</button></div></div>').join(''):'<p class="empty-admin">Aucun élément pour le moment. Créez votre première fiche.</p>';
+const container=$(kind+'-list');container.classList.add('admin-sortable');container.classList.toggle('admin-view-cards',adminViews[kind]==='cards');container.dataset.kind=kind;container.innerHTML=list.length?list.map(p=>'<div class="admin-row" data-row-id="'+escapeHtml(p.id)+'"><img class="admin-row-image" src="'+escapeHtml(p.image||photo)+'" alt="" loading="lazy"><div class="admin-row-content"><strong>'+escapeHtml(p.title)+'</strong><small>'+escapeHtml(p.description||'Aucune description')+'</small><div class="admin-row-meta">'+(kind==='projects'?'<span>'+escapeHtml(p.category||'Projet')+'</span><span>'+escapeHtml(p.year||'Année non renseignée')+'</span>':'<span>'+escapeHtml(p.audience||'Tous publics')+'</span><span>'+escapeHtml(p.format||'Atelier')+'</span>')+'</div></div><div class="admin-actions"><button type="button" data-toggle="'+kind+':'+escapeHtml(p.id)+'" aria-label="'+(p.published?'Dépublier':'Publier')+'" title="'+(p.published?'Publié — masquer':'Brouillon — publier')+'">'+(p.published?visibilityIcon:hiddenIcon)+'</button><button type="button" data-edit="'+kind+':'+escapeHtml(p.id)+'" aria-label="Modifier" title="Modifier">'+pencilIcon+'</button><button data-delete="'+kind+':'+escapeHtml(p.id)+'" aria-label="Supprimer">'+trashIcon+'</button></div></div>').join(''):'<p class="empty-admin">Aucun élément pour le moment. Créez votre première fiche.</p>';
 bindSortable(container,kind);
 }
 document.querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>{const [kind,id]=el.dataset.edit.split(':');editor(kind,id)});
