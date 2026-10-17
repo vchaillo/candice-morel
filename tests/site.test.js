@@ -288,3 +288,17 @@ test("mobile Studio uses image-first cards with content and actions below", () =
  assert.match(css, /grid-column:2!important;grid-row:2!important/);
  assert.match(css, /-webkit-line-clamp:2/);
 });
+
+test("mobile navigation uses readable Contact text and Book header geometry is stable", () => {
+ assert.match(css, /body>header nav \.nav-contact-text\{display:inline!important\}/);
+ assert.match(css, /body>header nav \.nav-contact-icon\{display:none!important\}/);
+ assert.match(css, /body\.book-active>header\{padding:12px 14px!important/);
+ assert.match(css, /\.book-monogram\{top:12px!important;left:14px!important/);
+});
+test("profile enters from above and editor close stays non-sticky", () => {
+ assert.match(script, /classList\.add\('is-profile'\)/);
+ assert.match(css, /\.custom-modal\.is-profile \.dialog-shell\{transform:translate3d\(0,-105vh,0\)/);
+ assert.match(css, /\.custom-modal:not\(\.is-confirmation\) \.modal-close\{position:absolute!important/);
+ assert.match(css, /\.compact-editor #crop-zoom::-webkit-slider-thumb/);
+ assert.match(css, /calc\(100% - 16px\) 2px no-repeat/);
+});
