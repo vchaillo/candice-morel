@@ -45,6 +45,12 @@ jobs:
           mkdir -p dist/src
           cp index.html app.js styles.css favicon.svg dist/
           cp src/core.js dist/src/
+          # Version local assets using the deployed commit, so iPhone browsers
+          # request fresh CSS, JavaScript and the imported local module.
+          VERSION="${GITHUB_SHA:0:12}"
+          sed -i "s|href=\"./styles.css\"|href=\"./styles.css?v=$VERSION\"|g" dist/index.html
+          sed -i "s|src=\"./app.js\"|src=\"./app.js?v=$VERSION\"|g" dist/index.html
+          sed -i "s|from \"./src/core.js\"|from \"./src/core.js?v=$VERSION\"|g" dist/app.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
