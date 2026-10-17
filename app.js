@@ -18,12 +18,22 @@ function setMobileMenu(open){
  mobileMenuToggle.setAttribute('aria-label',open?'Fermer le menu':'Ouvrir le menu');
  mobileMenu.setAttribute('aria-hidden',String(!open));
  mobileMenu.inert=!open;
+ // Keep the header above the sliding panel until its exit animation completes.
  document.body.classList.toggle('mobile-menu-open',open);
+ if(open)document.body.classList.add('mobile-menu-transition');
+ else if(!mobileMenu.classList.contains('is-open')) {
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)document.body.classList.remove('mobile-menu-transition');
+ }
 }
+mobileMenu?.addEventListener('transitionend',event=>{
+ if(event.target===mobileMenu&&event.propertyName==='transform'&&!mobileMenu.classList.contains('is-open')){
+  document.body.classList.remove('mobile-menu-transition');
+ }
+});
 mobileMenuToggle?.addEventListener('click',()=>setMobileMenu(!mobileMenu.classList.contains('is-open')));
 mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setMobileMenu(false)));
 window.addEventListener('keydown',event=>{if(event.key==='Escape')setMobileMenu(false)});
-window.addEventListener('resize',()=>{if(window.innerWidth>740)setMobileMenu(false)});
+window.addEventListener('resize',()=>{if(window.innerWidth>740){setMobileMenu(false);document.body.classList.remove('mobile-menu-transition')}});
 
 const photo='https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=900&q=80';
 const textNodes=[...document.querySelectorAll('[data-site-text]')];
