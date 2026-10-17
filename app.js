@@ -211,9 +211,12 @@ function bindSortable(container,kind){
      placeholder=document.createElement('div');
      placeholder.className='admin-drop-placeholder';
      placeholder.style.height=rect.height+'px';
+     placeholder.style.width=rect.width+'px';
      row.replaceWith(placeholder);
      ghost=row.cloneNode(true);
      ghost.classList.add('admin-drag-ghost');
+     ghost.style.setProperty('--drag-width',rect.width+'px');
+     ghost.style.setProperty('--drag-height',rect.height+'px');
      ghost.removeAttribute('data-row-id');
      Object.assign(ghost.style,{position:'fixed',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',margin:'0',zIndex:'9999',pointerEvents:'none'});
      container.append(ghost);
@@ -224,7 +227,17 @@ function bindSortable(container,kind){
     ghost.style.transform='translate3d('+(e.clientX-startX)+'px,'+(e.clientY-startY)+'px,0)';
     const others=[...container.querySelectorAll('.admin-row:not(.admin-drag-source):not(.admin-drag-ghost)')];
     let before=null;
-    for(const other of others){const rect=other.getBoundingClientRect();if(e.clientY<rect.top+rect.height/2){before=other;break}}
+    if(container.classList.contains('admin-view-cards')&&matchMedia('(min-width:741px)').matches){
+     // Grid ordering follows the actual two-dimensional card positions.
+     for(const other of others){
+      const rect=other.getBoundingClientRect();
+      if(e.clientY<rect.bottom&&e.clientX<rect.right){
+       if(e.clientY<rect.top+rect.height/2||e.clientX<rect.left+rect.width/2){before=other;break}
+      }
+     }
+    }else{
+     for(const other of others){const rect=other.getBoundingClientRect();if(e.clientY<rect.top+rect.height/2){before=other;break}}
+    }
     if(before!==placeholder.nextElementSibling)animateReorder(container,()=>container.insertBefore(placeholder,before));
     const margin=75,scrollSpeed=13;
     const bounds=container.getBoundingClientRect();
