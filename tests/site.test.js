@@ -302,3 +302,19 @@ test("profile enters from above and editor close stays non-sticky", () => {
  assert.match(css, /\.compact-editor #crop-zoom::-webkit-slider-thumb/);
  assert.match(css, /calc\(100% - 16px\) 2px no-repeat/);
 });
+
+test("Studio provides independent list and card view controls", () => {
+ assert.match(html, /data-view="projects:list"/);
+ assert.match(html, /data-view="projects:cards"/);
+ assert.match(html, /data-view="workshops:list"/);
+ assert.match(html, /data-view="workshops:cards"/);
+ assert.match(script, /const adminViews=\{projects:'list',workshops:'list'\}/);
+ assert.match(script, /container\.classList\.toggle\('admin-view-cards',adminViews\[kind\]==='cards'\)/);
+ assert.match(css, /\.admin-sortable\.admin-view-cards\{/);
+});
+test("mobile header keeps the navigation and monogram on one line", () => {
+ assert.match(css, /body>header,body\.book-active>header\{/);
+ assert.match(css, /display:flex!important;flex-direction:row!important;align-items:center!important/);
+ assert.match(css, /font-size:12px!important;letter-spacing:0!important/);
+ assert.match(css, /#admin\.admin\{padding-top:74px!important\}/);
+});
