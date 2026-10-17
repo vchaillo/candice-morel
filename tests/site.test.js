@@ -308,7 +308,7 @@ test("Studio provides independent list and card view controls", () => {
  assert.match(html, /data-view="projects:cards"/);
  assert.match(html, /data-view="workshops:list"/);
  assert.match(html, /data-view="workshops:cards"/);
- assert.match(script, /const adminViews=\{projects:'list',workshops:'list'\}/);
+ assert.match(script, /const adminViews=\{projects:'list',workshops:'list',book:'list'\}/);
  assert.match(script, /container\.classList\.toggle\('admin-view-cards',adminViews\[kind\]==='cards'\)/);
  assert.match(css, /\.admin-sortable\.admin-view-cards\{/);
 });
