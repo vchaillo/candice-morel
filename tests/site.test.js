@@ -318,3 +318,18 @@ test("mobile header keeps the navigation and monogram on one line", () => {
  assert.match(css, /font-size:12px!important;letter-spacing:0!important/);
  assert.match(css, /#admin\.admin\{padding-top:74px!important\}/);
 });
+
+test("mobile navigation opens as an accessible top-down editorial panel", () => {
+ assert.match(html, /class="mobile-menu-toggle"/);
+ assert.match(html, /id="mobile-navigation"/);
+ assert.match(script, /function setMobileMenu\(open\)/);
+ assert.match(script, /mobileMenu\.inert=!open/);
+ assert.match(css, /\.mobile-navigation\.is-open\{transform:translate3d\(0,0,0\)/);
+});
+test("Book CM is immediate and Studio account buttons are independently positioned", () => {
+ assert.match(css, /\.book-monogram,\.book-page\.book-open \.book-monogram\{/);
+ assert.match(css, /opacity:1!important;transition:none!important/);
+ assert.match(css, /#admin \.admin-head \.admin-account-actions\{\s*position:absolute!important;top:78px!important;right:14px!important/);
+ assert.match(css, /\.admin-stats-toolbar\{display:flex;align-items:center/);
+ assert.match(html, /class="admin-stats-toolbar"/);
+});
