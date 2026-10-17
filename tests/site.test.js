@@ -344,3 +344,10 @@ test("Book management is integrated into Studio and protected by Firestore rules
  assert.match(script, /writeBatch\(db\)/);
  assert.match(rules, /match \/book\/\{photoId\}/);
 });
+
+test("mobile navigation keeps its header layer through the closing transition", () => {
+ assert.match(script, /mobile-menu-transition/);
+ assert.match(script, /mobileMenu\?\.addEventListener\('transitionend'/);
+ assert.match(css, /body\.mobile-menu-transition>header/);
+ assert.match(css, /height:1\.5px!important;flex:0 0 1\.5px!important/);
+});
