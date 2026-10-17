@@ -1125,3 +1125,26 @@ body.studio-modal-active{overflow:hidden!important}
  #admin .admin-sortable:not(.admin-view-cards).is-reordering .admin-row:not(.admin-drag-ghost){padding-left:44px!important}
  #admin .admin-sortable:not(.admin-view-cards).is-reordering .admin-drag-handle{left:9px!important;top:50%!important;transform:translateY(-50%)!important}
 }
+
+/* Mobile Studio finishing: denser text rows and all actions, card actions bottom-right. */
+@media(max-width:740px){
+ #admin .admin-sortable:not(.admin-view-cards){row-gap:4px!important;gap:4px!important}
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost){
+  padding:5px 10px!important;min-height:38px!important;
+  margin-top:0!important;margin-bottom:0!important;
+  gap:8px!important;
+ }
+ #admin .admin-sortable:not(.admin-view-cards).is-reordering .admin-row:not(.admin-drag-ghost){padding-left:44px!important}
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost) .admin-actions button:not([data-edit]){
+  display:inline-flex!important;
+ }
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost) > .admin-actions{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;
+  gap:2px!important;
+ }
+ #admin .admin-sortable.admin-view-cards .admin-row:not(.admin-drag-ghost) > .admin-actions{
+  display:flex!important;justify-content:flex-end!important;align-self:end!important;
+  justify-self:end!important;align-items:center!important;
+  margin:0!important;padding:0 10px 10px 0!important;
+ }
+}
