@@ -555,7 +555,7 @@ body.studio-modal-active{overflow:hidden!important}
 /* Mobile Studio: place account controls immediately below the header.
    The 12px top inset mirrors the header's right-hand inset. */
 @media(max-width:740px){
- #admin.admin{padding-top:65px!important}
+ #admin.admin{padding-top:73px!important}
  #admin .admin-head{gap:15px!important}
  #admin .admin-head .admin-account-actions{margin:0!important;align-self:flex-end!important}
  #admin .admin-block{margin-top:28px!important}
