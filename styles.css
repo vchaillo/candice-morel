@@ -773,3 +773,96 @@ body.studio-modal-active{overflow:hidden!important}
  .admin-sortable.admin-view-cards .admin-drop-placeholder{min-height:240px}
 }
 @media(max-width:740px){.admin-view-switch{display:none!important}}
+
+
+/* The Book's CM is part of the Book from its very first animation frame.
+   Match the site's monogram geometry at each breakpoint, with no delayed fade. */
+.book-monogram,.book-page.book-open .book-monogram{
+ opacity:1!important;transition:none!important;pointer-events:auto!important;
+ top:27px!important;left:5%!important;width:42px!important;height:42px!important;
+}
+.book-monogram .header-cm{width:42px!important;height:42px!important}
+@media(max-width:740px){
+ .book-monogram,.book-page.book-open .book-monogram{top:12px!important;left:14px!important;width:42px!important;height:42px!important}
+ .book-monogram .header-cm{width:42px!important;height:42px!important}
+}
+@media(max-width:390px){
+ .book-monogram,.book-page.book-open .book-monogram{top:12px!important;left:14px!important;width:42px!important;height:42px!important}
+}
+/* Tablet/desktop: classical right-aligned links. Mobile: compact menu trigger. */
+.mobile-menu-toggle{display:none}
+.mobile-navigation{display:none}
+@media(min-width:741px){
+ body>header nav{justify-content:flex-end!important;gap:clamp(14px,2vw,27px)!important}
+}
+@media(max-width:740px){
+ body>header,body.book-active>header{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:space-between!important;padding:12px 14px!important;
+  height:66px!important;gap:0!important;
+ }
+ body>header .header-monogram,body.book-active>header .header-monogram{
+  width:42px!important;height:42px!important;flex:0 0 42px!important;align-self:center!important;
+ }
+ body>header .header-monogram svg{width:42px!important;height:42px!important}
+ body>header nav,body.book-active>header nav{display:none!important}
+ .mobile-menu-toggle{
+  display:flex!important;position:relative;z-index:9505;
+  width:44px;height:42px;padding:11px 8px;
+  flex-direction:column;justify-content:space-around;align-items:center;
+  border:0;background:transparent;color:inherit;
+ }
+ .mobile-menu-toggle span{display:block;width:27px;height:1.5px;background:currentColor;transition:transform .4s cubic-bezier(.76,0,.16,1),opacity .25s}
+ .mobile-menu-toggle.is-open span:first-child{transform:translateY(7px) rotate(45deg)}
+ .mobile-menu-toggle.is-open span:nth-child(2){opacity:0}
+ .mobile-menu-toggle.is-open span:last-child{transform:translateY(-7px) rotate(-45deg)}
+ .mobile-navigation{
+  display:block!important;position:fixed;top:0;left:0;right:0;
+  z-index:9500;height:100dvh;overflow-y:auto;overscroll-behavior:contain;
+  background:#171717;color:#f5f2eb;
+  transform:translate3d(0,-105%,0);visibility:hidden;pointer-events:none;
+  transition:transform .85s cubic-bezier(.76,0,.16,1),visibility 0s linear .85s;
+ }
+ .mobile-navigation.is-open{transform:translate3d(0,0,0);visibility:visible;pointer-events:auto;transition:transform .85s cubic-bezier(.76,0,.16,1),visibility 0s}
+ .mobile-navigation-inner{padding:115px 8% 38px;display:flex;flex-direction:column;min-height:100%;gap:0}
+ .mobile-navigation-eyebrow{font-size:10px;letter-spacing:.23em;color:#a8a29a;margin-bottom:25px}
+ .mobile-navigation-inner>a{
+  display:flex;align-items:baseline;gap:22px;padding:13px 0 16px;
+  border-bottom:1px solid #ffffff27;
+  font:400 clamp(34px,10vw,58px)/1.15 'Playfair Display',serif;
+  transition:padding-left .25s,color .25s;
+ }
+ .mobile-navigation-inner>a span{font:500 11px 'DM Sans',sans-serif;color:#b1aaa0;letter-spacing:.1em}
+ .mobile-navigation-inner>a:hover{padding-left:9px;color:#d7cbb8}
+ .mobile-navigation-bottom{margin-top:auto;padding-top:42px;font-size:10px;letter-spacing:.18em}
+ .mobile-navigation-bottom span{color:#aaa39b}
+ body.mobile-menu-open{overflow:hidden}
+ body.mobile-menu-open>header{z-index:9506!important;color:#fff!important}
+ body.mobile-menu-open>header .header-monogram{color:#fff!important}
+ /* Account buttons: absolute coordinates relative to Studio, not title flow. */
+ #admin.admin{position:relative!important;padding-top:145px!important}
+ #admin .admin-head .admin-account-actions{
+  position:absolute!important;top:78px!important;right:14px!important;
+  margin:0!important;order:0!important;align-self:auto!important;
+  display:flex!important;flex-wrap:nowrap!important;gap:8px!important;
+ }
+ #admin .admin-head{gap:12px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .mobile-navigation,.mobile-menu-toggle span{transition:none!important}
+}
+/* Stats and view toggles share one horizontal toolbar. */
+.admin-stats-toolbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:26px 0 18px}
+.admin-stats-toolbar .admin-stats{margin:0!important;flex:1 1 auto}
+.admin-stats-toolbar .admin-view-switch{flex:0 0 auto;margin:0}
+@media(max-width:740px){
+ .admin-stats-toolbar{margin:20px 0!important;gap:0}
+ .admin-stats-toolbar .admin-stats{width:100%!important}
+}
+/* Profile close stays white on hover, without movement. */
+.custom-modal .dialog-shell:has(.studio-profile)>.modal-close,
+.custom-modal .dialog-shell:has(.studio-profile)>.modal-close:hover,
+.custom-modal .dialog-shell:has(.studio-profile)>.modal-close:active{
+ color:#f5f3ef!important;background:transparent!important;
+ transform:none!important;border:0!important;box-shadow:none!important;
+}
