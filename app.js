@@ -125,7 +125,7 @@ $('book-page').querySelector('.book-close').addEventListener('click',()=>{
 });
 
 
-function startSubscriptions(){state.unsubs.forEach(f=>f());state.unsubs=[];for(const kind of Object.keys(configs)){const ref=collection(db,kind);const q=state.user?ref:query(ref,where("published","==",true));state.unsubs.push(onSnapshot(q,snapshot=>{state[kind]=snapshot.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number.isFinite(a.sortOrder)?a.sortOrder:Number.MAX_SAFE_INTEGER)-(Number.isFinite(b.sortOrder)?b.sortOrder:Number.MAX_SAFE_INTEGER));render()},e=>{console.error(e);message("Erreur de chargement Firestore : "+e.message)}))}}
+function startSubscriptions(){state.unsubs.forEach(f=>f());state.unsubs=[];for(const kind of Object.keys(configs)){const ref=collection(db,kind);const q=state.user?ref:query(ref,where("published","==",true));state.unsubs.push(onSnapshot(q,snapshot=>{if(kind==='book'&&snapshot.docs.length)bookCollectionManaged=true;state[kind]=snapshot.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number.isFinite(a.sortOrder)?a.sortOrder:Number.MAX_SAFE_INTEGER)-(Number.isFinite(b.sortOrder)?b.sortOrder:Number.MAX_SAFE_INTEGER));render()},e=>{console.error(e);message("Erreur de chargement Firestore : "+e.message)}))}}
 async function signIn(fn){$('login-error').textContent='';try{const result=await fn();if(!isAuthorizedAdmin(result.user,admins)){await signOut(auth);throw new Error("Ce compte n'est pas autorisé à accéder au Studio.")}}catch(e){$('login-error').textContent=e.code==='auth/unauthorized-domain'?"Ajoutez vchaillo.github.io aux domaines autorisés dans Firebase.":e.message||"Connexion impossible."}}
 $('login-form').onsubmit=e=>{e.preventDefault();signIn(()=>signInWithEmailAndPassword(auth,$('login-email').value,$('login-password').value))};
 $('google-login').onclick=()=>signIn(()=>signInWithPopup(auth,new GoogleAuthProvider()));
@@ -240,10 +240,11 @@ function bindSortable(container,kind){
 }
 
 const originalBookMarkup=$('book-grid').innerHTML;
+let bookCollectionManaged=false;
 function renderBook(published){
  const grid=$('book-grid');
  // Keep the original portfolio visible until an administrator adds Book photos.
- if(!state.book.length){grid.innerHTML=originalBookMarkup;bookImages=[...grid.querySelectorAll('.book-tile img')];return}
+ if(!state.book.length&&!bookCollectionManaged){grid.innerHTML=originalBookMarkup;bookImages=[...grid.querySelectorAll('.book-tile img')];$('book-count').textContent=String(bookImages.length).padStart(2,'0')+' PHOTOGRAPHIES';return}
  grid.innerHTML=published.map((p,index)=>'<button class="book-tile" type="button" data-book-index="'+index+'"><img loading="lazy" src="'+escapeHtml(p.image)+'" alt="'+escapeHtml(p.title)+'"><span>'+String(index+1).padStart(2,'0')+' / '+escapeHtml(p.title)+'</span></button>').join('');
  bookImages=[...grid.querySelectorAll('.book-tile img')];
  $('book-count').textContent=String(published.length).padStart(2,'0')+' PHOTOGRAPHIES';
@@ -272,6 +273,20 @@ document.querySelectorAll('[data-delete]').forEach(el=>el.onclick=()=>{const [ki
 document.querySelectorAll('[data-toggle]').forEach(el=>el.onclick=()=>{const [kind,id]=el.dataset.toggle.split(':');const item=state[kind].find(p=>p.id===id);if(!item)return;const target=!item.published;confirmDialog(target?'Publier cet élément ?':'Dépublier cet élément ?',target?'Il sera visible sur le site public.':'Il ne sera plus visible sur le site public.',async()=>{await setDoc(doc(db,kind,id),{published:target,updatedAt:serverTimestamp()},{merge:true});message(target?'Publication confirmée.':'Élément dépublié.')},'Annuler',target?'Publier':'Dépublier')});
 }
 $('add').onclick=()=>editor('projects');$('add-workshop').onclick=()=>editor('workshops');$('add-book').onclick=()=>editor('book');
+$('import-book').onclick=()=>{
+ if(state.book.length){message('Le Book contient déjà des photos gérées.');return}
+ confirmDialog('Importer les photos du Book ?','Les photos actuelles seront ajoutées au Studio et pourront ensuite être modifiées ou dépubliées.',async()=>{
+  const template=document.createElement('div');template.innerHTML=originalBookMarkup;
+  const tiles=[...template.querySelectorAll('.book-tile')];
+  const batch=writeBatch(db);
+  tiles.forEach((tile,index)=>{
+   const image=tile.querySelector('img');
+   const title=(tile.querySelector('span')?.textContent||'').replace(/^\\d+\\s*\\/\\s*/,'')||'Photographie '+(index+1);
+   batch.set(doc(db,'book',crypto.randomUUID()),{title,description:'',image:image?.getAttribute('src')||'',published:true,sortOrder:index,updatedAt:serverTimestamp()});
+  });
+  await batch.commit();bookCollectionManaged=true;message('Photos importées dans le Studio.');
+ });
+};
 let modalClose=null;
 function modal(html){document.body.classList.add('studio-modal-active');$('modal-root').innerHTML='<div class="modal custom-modal"><div class="dialog-shell"><button type="button" class="modal-close" aria-label="Fermer"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M5 5 19 19M19 5 5 19"/></svg></button>'+html+'</div></div>';$('modal-root').querySelector('.modal-close').onclick=()=>modalClose?.();const overlay=$('modal-root').firstElementChild;if(html.includes('class="studio-profile"')){overlay.classList.add('is-profile');requestAnimationFrame(()=>overlay.classList.add('profile-entered'))}overlay.onclick=e=>{if(e.target===overlay)modalClose?.()};}
 function dismiss(){modalClose=null;$('modal-root').replaceChildren();document.body.classList.remove('studio-modal-active')}
@@ -304,6 +319,6 @@ canvas.onpointerdown=e=>{if(!img)return;drag={x:e.clientX,y:e.clientY,ox:offsetX
 canvas.onpointermove=e=>{if(!drag||!img)return;const rect=canvas.getBoundingClientRect(),zoom=Number($('crop-zoom').value)/100,base=Math.max(canvas.width/img.width,canvas.height/img.height)*zoom,w=img.width*base,h=img.height*base,dx=(e.clientX-drag.x)*canvas.width/rect.width,dy=(e.clientY-drag.y)*canvas.height/rect.height;offsetX=moveImageCrop(drag.ox,dx,w,canvas.width);offsetY=moveImageCrop(drag.oy,dy,h,canvas.height);drawCrop()};
 canvas.onpointerup=()=>{if(drag){drag=null;updateCrop()}};canvas.onpointercancel=()=>{drag=null};
 function updateCrop(){if(!img)return;let quality=.8;do{imageData=canvas.toDataURL('image/jpeg',quality);quality-=.1}while(imageData.length>500000&&quality>.25);if(imageData.length>500000){message('Image trop volumineuse après compression.');imageData=null;return}imageRemoved=false;};
-form.onsubmit=async e=>{e.preventDefault();if(!state.user)return;const d=new FormData(form);const data={title:String(d.get('title')).trim(),description:String(d.get('description')),published:d.has('published'),image:imageRemoved?'':(imageData||item.image||''),sortOrder:Number.isFinite(item.sortOrder)?item.sortOrder:state[kind].length,updatedAt:Date.now()};for(const [name] of cfg.fields)data[name]=String(d.get(name)||'');const validation=kind==='book'?{valid:!!data.image&&!!data.title,errors:['Ajoutez une photo et un titre.']} :validateContent(kind,data);if(!validation.valid){message(validation.errors.join(' '));return}saving=true;const submit=form.querySelector('[type=submit]');submit.disabled=true;submit.textContent='Enregistrement…';try{await setDoc(doc(db,kind,id||crypto.randomUUID()),{...data,updatedAt:serverTimestamp()},{merge:true});dismiss();message('Modifications enregistrées sur Firebase.')}catch(err){saving=false;submit.disabled=false;submit.textContent='Enregistrer';message('Erreur Firestore : '+err.message)}};
+form.onsubmit=async e=>{e.preventDefault();if(!state.user)return;const d=new FormData(form);const data={title:String(d.get('title')).trim(),description:String(d.get('description')),published:d.has('published'),image:imageRemoved?'':(imageData||item.image||''),sortOrder:Number.isFinite(item.sortOrder)?item.sortOrder:state[kind].length,updatedAt:Date.now()};for(const [name] of cfg.fields)data[name]=String(d.get(name)||'');const validation=kind==='book'?{valid:!!data.image&&!!data.title,errors:['Ajoutez une photo et un titre.']} :validateContent(kind,data);if(!validation.valid){message(validation.errors.join(' '));return}saving=true;const submit=form.querySelector('[type=submit]');submit.disabled=true;submit.textContent='Enregistrement…';try{await setDoc(doc(db,kind,id||crypto.randomUUID()),{...data,updatedAt:serverTimestamp()},{merge:true});if(kind==='book')bookCollectionManaged=true;dismiss();message('Modifications enregistrées sur Firebase.')}catch(err){saving=false;submit.disabled=false;submit.textContent='Enregistrer';message('Erreur Firestore : '+err.message)}};
 }
 subscribeIntros();render();updateEditableIntros();showRoute();
