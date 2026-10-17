@@ -1082,3 +1082,15 @@ body.studio-modal-active{overflow:hidden!important}
 #admin .admin-sortable:not(.is-sorting) .admin-row:active{cursor:default!important}
 #admin .admin-sortable.is-reordering .admin-drag-handle{cursor:grab!important}
 #admin .admin-sortable.is-reordering .admin-drag-handle:active{cursor:grabbing!important}
+
+/* Mobile Studio: reorder on the left, view choices on the right. */
+@media(max-width:740px){
+ #admin .admin-stats-toolbar .admin-view-switch{
+  display:flex!important;align-self:stretch!important;width:100%!important;
+  justify-content:flex-end!important;align-items:center!important;
+ }
+ #admin .admin-stats-toolbar .admin-view-switch .admin-sort-toggle{
+  margin:0 auto 0 0!important;
+ }
+ #admin .admin-stats-toolbar + [id$="-list"]{margin-top:8px!important}
+}
