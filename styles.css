@@ -910,3 +910,39 @@ body.studio-modal-active{overflow:hidden!important}
   transition:color .25s ease .55s;
  }
 }
+
+/* Studio photo editor: photo actions follow the zoom control. */
+.custom-modal .compact-editor .editor-media{display:flex!important;flex-direction:column!important;gap:12px!important}
+.custom-modal .compact-editor .editor-media #image-crop{order:0!important}
+.custom-modal .compact-editor .editor-media .photo-controls{order:1!important;display:flex!important;gap:10px!important;align-items:center!important}
+.custom-modal .compact-editor .editor-media .photo-controls .upload-label{margin:0!important}
+.custom-modal .compact-editor .editor-media .photo-controls .photo-remove{margin:0!important}
+/* Zoom: solid black knob, black progress rail and muted remaining rail. */
+.compact-editor #crop-zoom{
+ --zoom-progress:0%;
+ background:linear-gradient(to right,#171717 0%,#171717 var(--zoom-progress),#aaa69f var(--zoom-progress),#aaa69f 100%) center / calc(100% - 16px) 2px no-repeat!important;
+}
+.compact-editor #crop-zoom::-webkit-slider-thumb{
+ width:16px!important;height:16px!important;border:0!important;
+ background:#171717!important;box-shadow:none!important;border-radius:50%!important;
+}
+.compact-editor #crop-zoom::-moz-range-thumb{
+ width:16px!important;height:16px!important;border:0!important;
+ background:#171717!important;box-shadow:none!important;border-radius:50%!important;
+}
+/* The floating card must preserve the source card's exact dimensions.
+   Grid cells and placeholder retain the same geometry as list sorting. */
+@media(min-width:741px){
+ #admin .admin-sortable.admin-view-cards .admin-drag-ghost{
+  position:fixed!important;width:var(--drag-width)!important;
+  height:var(--drag-height)!important;min-height:0!important;
+  max-height:var(--drag-height)!important;
+  grid-column:auto!important;grid-row:auto!important;
+  margin:0!important;overflow:hidden!important;
+  z-index:9999!important;pointer-events:none!important;
+ }
+ #admin .admin-sortable.admin-view-cards .admin-drop-placeholder{
+  width:100%!important;height:var(--placeholder-height,auto)!important;
+  min-height:0!important;align-self:stretch!important;margin:0!important;
+ }
+}
