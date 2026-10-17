@@ -1006,3 +1006,36 @@ body.studio-modal-active{overflow:hidden!important}
   position:static!important;flex-shrink:0!important;margin-top:auto!important;padding:18px 0 10px!important;
  }
 }
+
+/* Studio final polish: neutral statistics and balanced view/reorder controls. */
+#admin .admin-stats .admin-stat-filter,
+#admin .admin-stats .admin-stat-filter:hover,
+#admin .admin-stats .admin-stat-filter:active,
+#admin .admin-stats .admin-stat-filter.is-active{
+ background:transparent!important;background-color:transparent!important;
+ color:inherit!important;box-shadow:none!important;
+ border-top-color:transparent!important;border-left-color:transparent!important;border-right-color:transparent!important;
+}
+#admin .admin-stats .admin-stat-filter b,
+#admin .admin-stats .admin-stat-filter.is-active b{color:#171717!important}
+#admin .admin-stats .admin-stat-filter:not(.is-active){border-bottom-color:transparent!important}
+#admin .admin-stats .admin-stat-filter.is-active{border-bottom:2px solid #171717!important}
+#admin .admin-view-switch{display:flex!important;align-items:stretch!important;gap:0!important}
+#admin .admin-view-switch .admin-view-button{width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:0!important;margin:0!important}
+#admin .admin-view-switch .admin-sort-toggle{width:42px!important;min-width:42px!important;height:42px!important;padding:0!important;margin:0 8px 0 0!important;border:1px solid #d7d3cc!important;border-radius:4px!important}
+#admin .admin-view-switch .admin-sort-toggle.is-active{background:#171717!important;color:#fff!important;border-color:#171717!important}
+#admin .admin-sortable.is-reordering .admin-row{padding-left:0!important}
+#admin .admin-sortable.is-reordering .admin-drag-handle,
+#admin .admin-sortable.admin-view-cards.is-reordering .admin-drag-handle{
+ left:9px!important;top:9px!important;transform:none!important;
+ width:25px!important;height:27px!important;padding:2px!important;
+ background:#fff!important;color:#555!important;border:1px solid #e5e2dd!important;
+ border-radius:4px!important;box-shadow:0 1px 4px #00000012!important;
+}
+#admin .admin-sortable.is-reordering .admin-row-image{position:relative}
+@media(max-width:740px){
+ #admin .admin-stats-toolbar{gap:12px!important}
+ #admin .admin-stats-toolbar .admin-view-switch{align-self:flex-end!important}
+ #admin .admin-sortable.is-reordering .admin-row{padding-left:0!important}
+ #admin .admin-sortable.is-reordering .admin-drag-handle{left:10px!important;top:10px!important}
+}
