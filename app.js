@@ -8,6 +8,23 @@ const auth=getAuth(app),db=getFirestore(app);
 const admins=new Set(["9VuRSJuuEKc7fOQAjywrSIVB8Ql2","DcTMZFM3YhO5os0GSnVs1FIFW272"]);
 const state={user:null,projects:[],workshops:[],unsubs:[],loaded:false};
 const $=id=>document.getElementById(id);
+const mobileMenu=$('mobile-navigation');
+const mobileMenuToggle=document.querySelector('.mobile-menu-toggle');
+function setMobileMenu(open){
+ if(!mobileMenu||!mobileMenuToggle)return;
+ mobileMenu.classList.toggle('is-open',open);
+ mobileMenuToggle.classList.toggle('is-open',open);
+ mobileMenuToggle.setAttribute('aria-expanded',String(open));
+ mobileMenuToggle.setAttribute('aria-label',open?'Fermer le menu':'Ouvrir le menu');
+ mobileMenu.setAttribute('aria-hidden',String(!open));
+ mobileMenu.inert=!open;
+ document.body.classList.toggle('mobile-menu-open',open);
+}
+mobileMenuToggle?.addEventListener('click',()=>setMobileMenu(!mobileMenu.classList.contains('is-open')));
+mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setMobileMenu(false)));
+window.addEventListener('keydown',event=>{if(event.key==='Escape')setMobileMenu(false)});
+window.addEventListener('resize',()=>{if(window.innerWidth>740)setMobileMenu(false)});
+
 const photo='https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=900&q=80';
 const textNodes=[...document.querySelectorAll('[data-site-text]')];
 for(const kind of ['projects','workshops']){const el=$(kind+'-intro');if(el)el.dataset.siteText=kind}
