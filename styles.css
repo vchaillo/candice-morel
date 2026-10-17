@@ -1095,28 +1095,33 @@ body.studio-modal-active{overflow:hidden!important}
  #admin .admin-stats-toolbar + [id$="-list"]{margin-top:8px!important}
 }
 
-/* Mobile Studio: one consistent list layout with reliable image thumbnails. */
+/* Mobile Studio: cards retain their original image proportions; list is text-only. */
 @media(max-width:740px){
- #admin .admin-stats-toolbar .admin-view-switch .admin-view-button:not(.admin-sort-toggle){display:none!important}
- #admin .admin-stats-toolbar .admin-view-switch{justify-content:flex-start!important}
- #admin .admin-sortable .admin-row:not(.admin-drag-ghost){
-  display:grid!important;
-  grid-template-columns:96px minmax(0,1fr)!important;
-  grid-template-rows:auto auto!important;
-  gap:8px 12px!important;
-  align-items:start!important;
-  min-width:0!important;
+ #admin .admin-stats-toolbar .admin-view-switch{display:flex!important;justify-content:flex-end!important}
+ #admin .admin-stats-toolbar .admin-view-switch .admin-view-button:not(.admin-sort-toggle){display:inline-flex!important}
+ #admin .admin-stats-toolbar .admin-view-switch .admin-sort-toggle{margin-right:auto!important}
+ /* Compact list: title and edit action, no thumbnail or secondary metadata. */
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost){
+  display:flex!important;align-items:center!important;gap:12px!important;
+  padding:10px 12px!important;min-height:48px!important;
+  height:auto!important;max-height:none!important;
  }
- #admin .admin-sortable .admin-row:not(.admin-drag-ghost) > .admin-row-image{
-  grid-column:1!important;grid-row:1 / span 2!important;
-  display:block!important;width:96px!important;height:96px!important;
-  min-width:0!important;min-height:0!important;
-  aspect-ratio:1!important;object-fit:cover!important;
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost) > .admin-row-image,
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost) .admin-row-content small,
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost) .admin-row-meta,
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost) .admin-actions button:not([data-edit]){display:none!important}
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost) > .admin-row-content{
+  display:block!important;flex:1 1 auto!important;min-width:0!important;
+  grid-column:auto!important;grid-row:auto!important;
  }
- #admin .admin-sortable .admin-row:not(.admin-drag-ghost) > .admin-row-content{
-  grid-column:2!important;grid-row:1!important;min-width:0!important;
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost) .admin-row-content strong{
+  display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
  }
- #admin .admin-sortable .admin-row:not(.admin-drag-ghost) > .admin-actions{
-  grid-column:2!important;grid-row:2!important;min-width:0!important;
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost) > .admin-actions{
+  display:flex!important;flex:0 0 auto!important;grid-column:auto!important;grid-row:auto!important;
+  margin:0!important;padding:0!important;
  }
+ #admin .admin-sortable:not(.admin-view-cards) .admin-row:not(.admin-drag-ghost) .admin-actions [data-edit]{display:inline-flex!important}
+ #admin .admin-sortable:not(.admin-view-cards).is-reordering .admin-row:not(.admin-drag-ghost){padding-left:44px!important}
+ #admin .admin-sortable:not(.admin-view-cards).is-reordering .admin-drag-handle{left:9px!important;top:50%!important;transform:translateY(-50%)!important}
 }
