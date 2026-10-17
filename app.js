@@ -298,11 +298,13 @@ function renderBook(published){
 const adminViews={projects:'list',workshops:'list',book:'list'};
 const adminSortModes={projects:false,workshops:false,book:false};
 const adminFilters={projects:'total',workshops:'total',book:'total'};
+const sortCheckIcon='<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>';
 const gripIcon='<svg class="admin-grip-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5" r="1.5"/><circle cx="16" cy="5" r="1.5"/><circle cx="8" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/><circle cx="8" cy="19" r="1.5"/><circle cx="16" cy="19" r="1.5"/></svg>';
 document.querySelectorAll('[data-sort]').forEach(button=>button.addEventListener('click',()=>{
  const kind=button.dataset.sort;
  adminSortModes[kind]=!adminSortModes[kind];
  button.classList.toggle('is-active',adminSortModes[kind]);
+ button.innerHTML=adminSortModes[kind]?sortCheckIcon:gripIcon;
  button.setAttribute('aria-pressed',String(adminSortModes[kind]));
  button.setAttribute('aria-label',adminSortModes[kind]?'Terminer la réorganisation':'Activer la réorganisation');
  button.title=adminSortModes[kind]?'Terminer la réorganisation':'Réorganiser';
