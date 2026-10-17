@@ -368,3 +368,11 @@ test("Studio sorting is opt-in and publication stats are filters", () => {
  assert.match(css, /\.admin-sortable\.is-reordering \.admin-row\{touch-action:none!important/);
  for (const kind of ['projects','workshops','book']) assert.match(html, new RegExp('data-sort="'+kind+'"'));
 });
+
+test("Studio editor publication label and sorting control use consistent icons", () => {
+ assert.match(script, /publish-status-label/);
+ assert.match(script, /Ne pas publier sur le site/);
+ assert.match(script, /publicationToggle\.addEventListener\('change'/);
+ assert.match(css, /#content-editor\.compact-editor>\.editor-field/);
+ for (const kind of ['projects','workshops','book']) assert.match(html, new RegExp('data-sort="'+kind+'"'));
+});
