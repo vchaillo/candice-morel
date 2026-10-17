@@ -947,3 +947,28 @@ body.studio-modal-active{overflow:hidden!important}
   min-height:0!important;align-self:stretch!important;margin:0!important;
  }
 }
+
+/* Studio: filtering and opt-in reorder controls. */
+#admin .admin-stats-toolbar{align-items:flex-end!important}
+#admin .admin-stats-toolbar .admin-view-switch{align-self:flex-end!important;display:flex!important;align-items:center!important}
+#admin .admin-stat-filter{font-family:inherit;text-align:inherit;cursor:pointer;border:1px solid transparent;border-bottom:2px solid transparent;transition:border-color .2s,background .2s}
+#admin .admin-stat-filter:hover{background:#f0efec}
+#admin .admin-stat-filter.is-active{border-bottom-color:#171717!important}
+#admin .admin-stat-filter:focus-visible,#admin .admin-sort-toggle:focus-visible{outline:2px solid #171717;outline-offset:2px}
+#admin .admin-sort-toggle{margin-left:7px!important;border-left:1px solid #d7d3cc!important}
+#admin .admin-sort-toggle.is-active{background:#171717!important;color:#fff!important}
+#admin .admin-sortable .admin-row{touch-action:pan-y!important}
+#admin .admin-sortable.is-reordering .admin-row{touch-action:none!important;cursor:grab}
+#admin .admin-sortable.is-reordering .admin-row:active{cursor:grabbing}
+#admin .admin-sortable .admin-row{position:relative}
+#admin .admin-drag-handle{position:absolute;z-index:2;left:3px;top:50%;transform:translateY(-50%);width:20px;height:24px;display:flex;align-items:center;justify-content:center;color:#777;pointer-events:none}
+#admin .admin-sortable.is-reordering .admin-row{padding-left:28px}
+#admin .admin-sortable.admin-view-cards.is-reordering .admin-row{padding-left:0!important}
+#admin .admin-sortable.admin-view-cards .admin-drag-handle{left:8px;top:13px;transform:none;background:#fff;border-radius:3px;padding:2px}
+@media(max-width:740px){
+ #admin .admin-stats-toolbar{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important}
+ #admin .admin-stats-toolbar .admin-stats{width:100%!important}
+ #admin .admin-stats-toolbar .admin-view-switch{display:flex!important;align-self:flex-end!important}
+ #admin .admin-sortable.is-reordering .admin-row{padding-left:28px!important}
+ #admin .admin-sortable.admin-view-cards.is-reordering .admin-row{padding-left:0!important}
+}
