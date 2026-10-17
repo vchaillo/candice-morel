@@ -376,3 +376,9 @@ test("Studio editor publication label and sorting control use consistent icons",
  assert.match(css, /#content-editor\.compact-editor>\.editor-field/);
  for (const kind of ['projects','workshops','book']) assert.match(html, new RegExp('data-sort="'+kind+'"'));
 });
+
+test("Studio drag requires the dedicated handle, and controls stay square", () => {
+ assert.match(script, /event\.target\.closest\('\.admin-drag-handle'\)/);
+ assert.match(css, /#admin \.admin-view-switch \.admin-sort-toggle,[\s\S]*?border-radius:0!important/);
+ assert.match(css, /#admin \.admin-stats \.admin-stat-filter,[\s\S]*?background:#fff!important/);
+});
