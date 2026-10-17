@@ -56,6 +56,25 @@ const configs=CONTENT_CONFIG;
 function message(text){if(!text)return;const stack=$('toast-stack');if(!stack)return;const toast=document.createElement('div');toast.className='site-toast'+(/erreur|impossible|refus|échec/i.test(text)?' toast-error':'');const content=document.createElement('span');content.textContent=text;const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label','Fermer la notification');toast.append(content,close);stack.append(toast);const remove=()=>{if(!toast.isConnected)return;toast.classList.add('toast-out');setTimeout(()=>toast.remove(),230)};close.onclick=remove;setTimeout(remove,4600);while(stack.children.length>4)stack.firstElementChild.remove()}
 let bookPreviouslyOpen=false;
 let bookReturnHash='#home';
+// Gentle editorial navigation: longer than native smooth scrolling, with eased ends.
+let navigationScrollFrame=0;
+function scrollToSection(element){
+ if(!element)return;
+ cancelAnimationFrame(navigationScrollFrame);
+ const start=window.scrollY;
+ const target=Math.max(0,element.getBoundingClientRect().top+start);
+ const distance=target-start;
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches){window.scrollTo(0,target);return}
+ const duration=Math.min(1250,Math.max(850,850+Math.abs(distance)*0.12));
+ const begun=performance.now();
+ const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+ const step=now=>{
+  const progress=Math.min(1,(now-begun)/duration);
+  window.scrollTo({top:start+distance*ease(progress),behavior:'instant'});
+  if(progress<1)navigationScrollFrame=requestAnimationFrame(step);
+ };
+ navigationScrollFrame=requestAnimationFrame(step);
+}
 function showRoute(){
   const studio=['#studio','#admin'].includes(location.hash);
   const book=location.hash==='#book';
@@ -81,7 +100,7 @@ function showRoute(){
   document.querySelector('header').classList.toggle('header-studio',studio);
   if(studio)window.scrollTo(0,0);
   else if(!book&&(!location.hash||location.hash==='#home'))window.scrollTo(0,0);
-  else if(!book&&location.hash&&$(location.hash.slice(1)))requestAnimationFrame(()=>$(location.hash.slice(1)).scrollIntoView({block:'start',behavior:'smooth'}));
+  else if(!book&&location.hash&&$(location.hash.slice(1)))requestAnimationFrame(()=>scrollToSection($(location.hash.slice(1))));
 }
 
 // Book: keyboard-accessible image viewer with history-friendly hash routing.
