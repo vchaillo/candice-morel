@@ -333,3 +333,14 @@ test("Book CM is immediate and Studio account buttons are independently position
  assert.match(css, /\.admin-stats-toolbar\{display:flex;align-items:center/);
  assert.match(html, /class="admin-stats-toolbar"/);
 });
+
+test("Book management is integrated into Studio and protected by Firestore rules", () => {
+ assert.match(html, /id="add-book"/);
+ assert.match(html, /id="book-list"/);
+ assert.match(html, /id="book-stats"/);
+ assert.match(html, /id="import-book"/);
+ assert.match(script, /function renderBook\(published\)/);
+ assert.match(script, /editor\('book'\)/);
+ assert.match(script, /writeBatch\(db\)/);
+ assert.match(rules, /match \/book\/\{photoId\}/);
+});
