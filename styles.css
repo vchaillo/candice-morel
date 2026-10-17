@@ -1148,3 +1148,18 @@ body.studio-modal-active{overflow:hidden!important}
   margin:0!important;padding:0 10px 10px 0!important;
  }
 }
+
+/* Mobile Studio: consistent rhythm in list and card views, with breathing room at both ends. */
+@media(max-width:740px){
+ #admin .admin-stats-toolbar + [id$="-list"]{
+  margin-top:18px!important;
+ }
+ #admin .admin-sortable,
+ #admin .admin-sortable.admin-view-cards{
+  row-gap:6px!important;gap:6px!important;
+  padding-bottom:20px!important;
+ }
+ #admin .admin-sortable .admin-row:not(.admin-drag-ghost){
+  margin-top:0!important;margin-bottom:0!important;
+ }
+}
