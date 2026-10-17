@@ -183,12 +183,14 @@ const visibilityIcon="<svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill
 const trashIcon='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg>';// Pointer + keyboard sorting, persisted atomically in Firestore.
 async function persistOrder(container,kind){
  const ids=[...container.querySelectorAll('[data-row-id]')].map(el=>el.dataset.rowId);
- const before=state[kind].map(el=>el.id);
- if(ids.every((id,i)=>id===before[i]))return;
  const previous=[...state[kind]];
- state[kind]=ids.map(id=>previous.find(el=>el.id===id));
+ const visibleIds=new Set(ids);
+ const iterator=ids[Symbol.iterator]();
+ const reordered=previous.map(item=>visibleIds.has(item.id)?previous.find(entry=>entry.id===iterator.next().value):item);
+ if(reordered.every((item,i)=>item.id===previous[i].id))return;
+ state[kind]=reordered;
  const batch=writeBatch(db);
- ids.forEach((id,i)=>batch.update(doc(db,kind,id),{sortOrder:i}));
+ reordered.forEach((item,i)=>batch.update(doc(db,kind,item.id),{sortOrder:i}));
  try{await batch.commit();message('Nouvel ordre enregistré.')}
  catch(error){state[kind]=previous;render();message('Impossible de modifier l’ordre : '+error.message)}
 }
@@ -202,6 +204,7 @@ function animateReorder(container,change){
  }
 }
 function bindSortable(container,kind){
+ if(!adminSortModes[kind])return;
  const rows=[...container.querySelectorAll('.admin-row')];
  for(const row of rows){
   row.tabIndex=0;
@@ -293,6 +296,24 @@ function renderBook(published){
  $('book-count').textContent=String(published.length).padStart(2,'0')+' PHOTOGRAPHIES';
 }
 const adminViews={projects:'list',workshops:'list',book:'list'};
+const adminSortModes={projects:false,workshops:false,book:false};
+const adminFilters={projects:'total',workshops:'total',book:'total'};
+const gripIcon='<svg class="admin-grip-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5" r="1.5"/><circle cx="16" cy="5" r="1.5"/><circle cx="8" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/><circle cx="8" cy="19" r="1.5"/><circle cx="16" cy="19" r="1.5"/></svg>';
+document.querySelectorAll('[data-sort]').forEach(button=>button.addEventListener('click',()=>{
+ const kind=button.dataset.sort;
+ adminSortModes[kind]=!adminSortModes[kind];
+ button.classList.toggle('is-active',adminSortModes[kind]);
+ button.setAttribute('aria-pressed',String(adminSortModes[kind]));
+ button.setAttribute('aria-label',adminSortModes[kind]?'Terminer la réorganisation':'Activer la réorganisation');
+ button.title=adminSortModes[kind]?'Terminer la réorganisation':'Réorganiser';
+ render();
+}));
+document.querySelectorAll('.admin-stats').forEach(stats=>stats.addEventListener('click',event=>{
+ const button=event.target.closest('[data-filter]');if(!button)return;
+ const kind=stats.id.replace('-stats','');
+ adminFilters[kind]=button.dataset.filter;
+ render();
+}));
 document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
  const [kind,view]=button.dataset.view.split(':');
  if(!['projects','workshops','book'].includes(kind)||!['list','cards'].includes(view))return;
@@ -307,8 +328,8 @@ document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener
 }));
 function render(){
 for(const kind of Object.keys(configs)){const list=state[kind],published=visibleItems(list);if(kind==='book'){renderBook(published)}else{const grid=$(kind==='projects'?'project-grid':'workshop-grid');grid.innerHTML=published.length?published.map(p=>'<article><div class="image"><img loading="lazy" src="'+escapeHtml(p.image||photo)+'" alt="'+escapeHtml(p.title)+'"></div><h3>'+escapeHtml(p.title)+'</h3><p>'+escapeHtml(kind==='projects'?(p.category||'Projet')+' · '+(p.year||''):(p.audience||'')+' · '+(p.format||''))+'</p><div class="item-description">'+escapeHtml(p.description||'')+'</div></article>').join(''):'<p>Aucun contenu publié pour le moment.</p>';}
-const stats=$(kind+'-stats');const counts=contentStats(list);stats.innerHTML=[['Total',counts.total],['Publiés',counts.published],['Brouillons',counts.drafts]].map(([label,n])=>'<div class="stat"><b>'+n+'</b><span>'+label+'</span></div>').join('');
-const container=$(kind+'-list');container.classList.add('admin-sortable');container.classList.toggle('admin-view-cards',adminViews[kind]==='cards');container.dataset.kind=kind;container.innerHTML=list.length?list.map(p=>'<div class="admin-row" data-row-id="'+escapeHtml(p.id)+'"><img class="admin-row-image" src="'+escapeHtml(p.image||photo)+'" alt="" loading="lazy"><div class="admin-row-content"><strong>'+escapeHtml(p.title)+'</strong><small>'+escapeHtml(p.description||'Aucune description')+'</small><div class="admin-row-meta">'+(kind==='projects'?'<span>'+escapeHtml(p.category||'Projet')+'</span><span>'+escapeHtml(p.year||'Année non renseignée')+'</span>':kind==='workshops'?'<span>'+escapeHtml(p.audience||'Tous publics')+'</span><span>'+escapeHtml(p.format||'Atelier')+'</span>':'<span>Photographie</span>')+'</div></div><div class="admin-actions"><button type="button" data-toggle="'+kind+':'+escapeHtml(p.id)+'" aria-label="'+(p.published?'Dépublier':'Publier')+'" title="'+(p.published?'Publié — masquer':'Brouillon — publier')+'">'+(p.published?visibilityIcon:hiddenIcon)+'</button><button type="button" data-edit="'+kind+':'+escapeHtml(p.id)+'" aria-label="Modifier" title="Modifier">'+pencilIcon+'</button><button data-delete="'+kind+':'+escapeHtml(p.id)+'" aria-label="Supprimer">'+trashIcon+'</button></div></div>').join(''):'<p class="empty-admin">Aucun élément pour le moment. Créez votre première fiche.</p>';
+const stats=$(kind+'-stats');const counts=contentStats(list);stats.innerHTML=[['Total',counts.total,'total'],['Publiés',counts.published,'published'],['Brouillons',counts.drafts,'drafts']].map(([label,n,filter])=>'<button type="button" class="stat admin-stat-filter '+(adminFilters[kind]===filter?'is-active':'')+'" data-filter="'+filter+'" aria-pressed="'+(adminFilters[kind]===filter)+'" title="Afficher '+label.toLowerCase()+'"><b>'+n+'</b><span>'+label+'</span></button>').join('');
+const container=$(kind+'-list');container.classList.add('admin-sortable');container.classList.toggle('is-reordering',adminSortModes[kind]);container.classList.toggle('admin-view-cards',adminViews[kind]==='cards');container.dataset.kind=kind;const adminList=list.filter(p=>adminFilters[kind]==='total'||(adminFilters[kind]==='published'?p.published:!p.published));container.innerHTML=adminList.length?adminList.map(p=>'<div class="admin-row" data-row-id="'+escapeHtml(p.id)+'">'+(adminSortModes[kind]?'<span class="admin-drag-handle" aria-hidden="true">'+gripIcon+'</span>':'')+'<img class="admin-row-image" src="'+escapeHtml(p.image||photo)+'" alt="" loading="lazy"><div class="admin-row-content"><strong>'+escapeHtml(p.title)+'</strong><small>'+escapeHtml(p.description||'Aucune description')+'</small><div class="admin-row-meta">'+(kind==='projects'?'<span>'+escapeHtml(p.category||'Projet')+'</span><span>'+escapeHtml(p.year||'Année non renseignée')+'</span>':kind==='workshops'?'<span>'+escapeHtml(p.audience||'Tous publics')+'</span><span>'+escapeHtml(p.format||'Atelier')+'</span>':'<span>Photographie</span>')+'</div></div><div class="admin-actions"><button type="button" data-toggle="'+kind+':'+escapeHtml(p.id)+'" aria-label="'+(p.published?'Dépublier':'Publier')+'" title="'+(p.published?'Publié — masquer':'Brouillon — publier')+'">'+(p.published?visibilityIcon:hiddenIcon)+'</button><button type="button" data-edit="'+kind+':'+escapeHtml(p.id)+'" aria-label="Modifier" title="Modifier">'+pencilIcon+'</button><button data-delete="'+kind+':'+escapeHtml(p.id)+'" aria-label="Supprimer">'+trashIcon+'</button></div></div>').join(''):'<p class="empty-admin">Aucun élément pour le moment. Créez votre première fiche.</p>';
 bindSortable(container,kind);
 }
 document.querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>{const [kind,id]=el.dataset.edit.split(':');editor(kind,id)});
