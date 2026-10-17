@@ -219,7 +219,7 @@ function bindSortable(container,kind){
    persistOrder(container,kind);
   });
   row.addEventListener('pointerdown',event=>{
-   if(event.button!==0||event.target.closest('button,a,input,textarea,select,[contenteditable]'))return;
+   if(event.button!==0||!event.target.closest('.admin-drag-handle'))return;
    const startX=event.clientX,startY=event.clientY;
    let active=false,finished=false,placeholder=null,ghost=null,offsetY=0,offsetX=0;
    const originalNext=row.nextElementSibling;
