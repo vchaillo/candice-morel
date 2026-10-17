@@ -1094,3 +1094,29 @@ body.studio-modal-active{overflow:hidden!important}
  }
  #admin .admin-stats-toolbar + [id$="-list"]{margin-top:8px!important}
 }
+
+/* Mobile Studio: one consistent list layout with reliable image thumbnails. */
+@media(max-width:740px){
+ #admin .admin-stats-toolbar .admin-view-switch .admin-view-button:not(.admin-sort-toggle){display:none!important}
+ #admin .admin-stats-toolbar .admin-view-switch{justify-content:flex-start!important}
+ #admin .admin-sortable .admin-row:not(.admin-drag-ghost){
+  display:grid!important;
+  grid-template-columns:96px minmax(0,1fr)!important;
+  grid-template-rows:auto auto!important;
+  gap:8px 12px!important;
+  align-items:start!important;
+  min-width:0!important;
+ }
+ #admin .admin-sortable .admin-row:not(.admin-drag-ghost) > .admin-row-image{
+  grid-column:1!important;grid-row:1 / span 2!important;
+  display:block!important;width:96px!important;height:96px!important;
+  min-width:0!important;min-height:0!important;
+  aspect-ratio:1!important;object-fit:cover!important;
+ }
+ #admin .admin-sortable .admin-row:not(.admin-drag-ghost) > .admin-row-content{
+  grid-column:2!important;grid-row:1!important;min-width:0!important;
+ }
+ #admin .admin-sortable .admin-row:not(.admin-drag-ghost) > .admin-actions{
+  grid-column:2!important;grid-row:2!important;min-width:0!important;
+ }
+}
